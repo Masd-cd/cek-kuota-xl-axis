@@ -11,12 +11,14 @@
         .progress-bar-container { width: 100%; background-color: #334155; border-radius: 9999px; height: 8px; overflow: hidden; }
         .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease; }
         
-        /* Animasi Transisi Baru: Super Mulus Anti Glitch */
+        /* Animasi Transisi Diperlambat dan Diperhalus */
         .fade-in-up {
-            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            /* Durasi diubah jadi 0.7s dengan efek kurva yang lebih santai */
+            animation: fadeInUp 0.7s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
+            /* Jarak luncur ditambah jadi 30px agar lebih 'mengambang' */
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
@@ -150,22 +152,18 @@
     <script>
         // --- LOGIKA PINDAH HALAMAN BEBAS GLITCH ---
         function switchView(viewId) {
-            // 1. Daftar semua ID halaman yang ada
             const views = ['view-dashboard', 'view-sidompul', 'view-downloader', 'view-sholat'];
 
-            // 2. Sembunyikan SEMUA halaman & copot animasinya
             views.forEach(id => {
                 const el = document.getElementById(id);
                 el.classList.add('hidden');
                 el.classList.remove('block', 'fade-in-up');
             });
 
-            // 3. Tampilkan hanya halaman yang diminta
             const targetView = document.getElementById(viewId);
             targetView.classList.remove('hidden');
             targetView.classList.add('block');
             
-            // 4. Trigger animasi sedikit delay agar me-reset CSS
             setTimeout(() => {
                 targetView.classList.add('fade-in-up');
             }, 10);
