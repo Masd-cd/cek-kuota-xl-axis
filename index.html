@@ -229,8 +229,7 @@
             document.getElementById('hasilKuota').classList.remove('hidden');
         }
 
-        // --- LOGIKA API FACEBOOK DOWNLOADER (MODE DETEKTIF) ---
-                // --- LOGIKA API FACEBOOK DOWNLOADER (VERSI ANTI CRASH) ---
+        // --- LOGIKA API FACEBOOK DOWNLOADER (ULTIMATE DETEKTIF) ---
         async function downloadFB() {
             let inputUrl = document.getElementById('inputFbUrl').value;
             if (!inputUrl) { alert("Masukkan Link Facebook terlebih dahulu!"); return; }
@@ -240,22 +239,19 @@
             document.getElementById('btnFbCek').disabled = true;
 
             try {
-                // Jalur khusus Vercel
                 const targetUrl = `/api/proxy-fb?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
                 const response = await fetch(targetUrl);
                 
-                if (!response.ok) {
-                    throw new Error(`Jembatan Vercel Error (HTTP ${response.status}). Cek vercel.json!`);
-                }
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
 
                 const json = await response.json();
 
-                if (json.success && json.data && json.data.api && json.data.api.status === "OK") {
+                // Kita longgarkan pengecekannya
+                if (json.success && json.data) {
                     
-                    document.getElementById('fbTitle').innerText = json.data.api.title || "Video Facebook";
-                    document.getElementById('fbThumb').src = json.data.api.imagePreviewUrl || "";
+                    document.getElementById('fbTitle').innerText = (json.data.api && json.data.api.title) ? json.data.api.title : "Video Facebook";
+                    document.getElementById('fbThumb').src = (json.data.api && json.data.api.imagePreviewUrl) ? json.data.api.imagePreviewUrl : "";
                     
-                    // SABUK PENGAMAN 1: Cek apakah kotak mediaStats benar-benar ada
                     let views = "-";
                     if (json.data.mediaStats && json.data.mediaStats.viewsCount) {
                         views = json.data.mediaStats.viewsCount;
@@ -266,34 +262,41 @@
                     let audioUrl = "";
                     let duration = "-";
 
-                    // SABUK PENGAMAN 2: Cek apakah mediaItems ada dan isinya array
+                    // Jurus 1: Cek di mediaItems dengan huruf kecil/besar sembarang
                     if (json.data.mediaItems && Array.isArray(json.data.mediaItems)) {
                         json.data.mediaItems.forEach(item => {
-                            if (item.type === "Video") {
+                            let typeStr = String(item.type || "").toLowerCase();
+                            if (typeStr.includes("video")) {
                                 hdVideoUrl = item.mediaUrl; 
                                 duration = item.mediaDuration || duration;
                             }
-                            if (item.type === "Audio") {
+                            if (typeStr.includes("audio")) {
                                 audioUrl = item.mediaUrl;
                             }
                         });
+                    } 
+                    // Jurus 2: Kalau Dinns ganti struktur tiba-tiba
+                    else if (json.data.url) {
+                        hdVideoUrl = json.data.url;
+                    } else if (json.data.video) {
+                        hdVideoUrl = json.data.video;
                     }
 
                     document.getElementById('fbDur').innerText = duration;
-
                     const linkDiv = document.getElementById('fbLinks');
                     linkDiv.innerHTML = ""; 
 
                     if(hdVideoUrl) {
-                        linkDiv.innerHTML += `<a href="${hdVideoUrl}" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-md">📽️ Download Video (HD)</a>`;
+                        linkDiv.innerHTML += `<a href="${hdVideoUrl}" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-md">📽️ Download Video</a>`;
                     }
                     if(audioUrl) {
                         linkDiv.innerHTML += `<a href="${audioUrl}" target="_blank" class="block w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-3 px-4 rounded-lg text-center transition-colors border border-slate-600 mt-2">🎵 Download Audio Saja</a>`;
                     }
 
-                    // Kalau API sukses tapi nggak dapat link apa-apa
+                    // Kalau masih gagal juga, TAMPILKAN ISI MENTAHNYA KE LAYAR!
                     if (!hdVideoUrl && !audioUrl) {
-                        alert("API berhasil dipanggil, tapi tidak menemukan link video/audio yang bisa didownload. Coba video lain.");
+                        const isiMentah = JSON.stringify(json.data).substring(0, 300); // Ambil 300 huruf pertama biar layar ga kepenuhan
+                        alert("API sukses, tapi link disembunyikan. Ini isi mentah dari server Dinns:\n\n" + isiMentah + "...");
                         return;
                     }
 
@@ -302,13 +305,13 @@
                     alert("Gagal memproses link! Pesan Server: " + (json.message || "Data API tidak sesuai."));
                 }
             } catch (error) {
-                console.error("LOG ERROR ASLI:", error);
                 alert("Detail Error:\n" + error.message);
             } finally {
                 document.getElementById('loadingFb').classList.add('hidden');
                 document.getElementById('btnFbCek').disabled = false;
             }
         }
+
     </script>
 </body>
 </html>
