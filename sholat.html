@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Sholat - MasD VPNStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex justify-center p-4">
+
+    <div class="w-full max-w-md space-y-4 mt-4 fade-in-up">
+        
+        <a href="index.html" class="inline-flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span>Kembali ke Menu</span>
+        </a>
+
+        <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20 border-emerald-500/30">
+            <div class="flex items-center space-x-3 mb-2">
+                <div class="bg-emerald-600 p-2 rounded-lg"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></div>
+                <h2 class="font-bold text-xl text-white">Jadwal Sholat</h2>
+            </div>
+            <p class="text-sm text-slate-400">Masukkan nama kota atau kabupaten untuk melihat jadwal hari ini.</p>
+            <div class="flex flex-col space-y-3 mt-2">
+                <input type="text" id="inputKota" placeholder="Contoh: Tulungagung atau Jakarta" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+                <button id="btnCari" onclick="cariJadwal()" class="bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-bold py-3 px-6 rounded-lg hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] active:scale-95 transition-all text-center w-full">Cari Jadwal</button>
+            </div>
+        </div>
+
+        <div id="loadingSholat" class="hidden text-center text-slate-400 py-4">
+            <svg class="animate-spin h-8 w-8 mx-auto text-emerald-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p>Mencari data ke server...</p>
+        </div>
+
+        <div id="hasilSholat" class="hidden space-y-4">
+            
+            <div class="card p-4 rounded-2xl shadow-lg shadow-black/20 border-emerald-500/20 text-center">
+                <h3 class="font-extrabold text-xl text-emerald-400 uppercase tracking-wider" id="txtLokasi">-</h3>
+                <p class="text-slate-400 text-sm font-semibold" id="txtDaerah">-</p>
+                <div class="mt-3 inline-block bg-slate-800 border border-slate-600 text-slate-300 text-xs px-3 py-1 rounded-full" id="txtTanggal">-</div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3" id="gridWaktu">
+                </div>
+
+        </div>
+
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools by Dinns</p>
+    </div>
+
+    <script>
+        const API_KEY = "MasDSukaCoL1";
+
+        async function cariJadwal() {
+            let inputKota = document.getElementById('inputKota').value.trim();
+            if (!inputKota) { alert("Masukkan nama kota terlebih dahulu!"); return; }
+
+            document.getElementById('loadingSholat').classList.remove('hidden');
+            document.getElementById('hasilSholat').classList.add('hidden');
+            document.getElementById('btnCari').disabled = true;
+
+            try {
+                // Memanggil Jembatan Vercel untuk Jadwal Sholat
+                const targetUrl = `/api/proxy-sholat?apikey=${API_KEY}&q=${encodeURIComponent(inputKota)}`;
+                const response = await fetch(targetUrl);
+                
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+
+                const json = await response.json();
+
+                if (json.success && json.data && json.data.jadwal) {
+                    
+                    // Mengisi Data Header
+                    document.getElementById('txtLokasi').innerText = json.data.lokasi;
+                    document.getElementById('txtDaerah').innerText = json.data.daerah;
+                    document.getElementById('txtTanggal').innerText = json.data.jadwal.tanggal;
+
+                    // Daftar Waktu Sholat
+                    const waktuSholat = [
+                        { nama: "Imsak", waktu: json.data.jadwal.imsak, icon: "🌙" },
+                        { nama: "Subuh", waktu: json.data.jadwal.subuh, icon: "🕌" },
+                        { nama: "Terbit", waktu: json.data.jadwal.terbit, icon: "🌅" },
+                        { nama: "Dhuha", waktu: json.data.jadwal.dhuha, icon: "☀️" },
+                        { nama: "Dzuhur", waktu: json.data.jadwal.dzuhur, icon: "🌞" },
+                        { nama: "Ashar", waktu: json.data.jadwal.ashar, icon: "⛅" },
+                        { nama: "Maghrib", waktu: json.data.jadwal.maghrib, icon: "🌇" },
+                        { nama: "Isya", waktu: json.data.jadwal.isya, icon: "🌌" }
+                    ];
+
+                    // Menyuntikkan ke Grid HTML
+                    const gridDiv = document.getElementById('gridWaktu');
+                    gridDiv.innerHTML = ""; // Bersihkan isi lama
+
+                    waktuSholat.forEach(item => {
+                        gridDiv.innerHTML += `
+                            <div class="bg-slate-800 border border-slate-700 p-4 rounded-xl flex items-center justify-between shadow-sm hover:border-emerald-500/50 transition-colors">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-xl">${item.icon}</span>
+                                    <span class="text-slate-400 text-sm font-semibold">${item.nama}</span>
+                                </div>
+                                <span class="text-white font-bold text-lg">${item.waktu}</span>
+                            </div>
+                        `;
+                    });
+
+                    // Tampilkan Hasil
+                    document.getElementById('hasilSholat').classList.remove('hidden');
+                } else {
+                    alert("Kota tidak ditemukan atau server sedang sibuk. Coba kata kunci lain (misal: 'Jakarta').");
+                }
+            } catch (error) {
+                alert("Terjadi kesalahan jaringan atau server API sedang *down*.");
+                console.error(error);
+            } finally {
+                document.getElementById('loadingSholat').classList.add('hidden');
+                document.getElementById('btnCari').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
