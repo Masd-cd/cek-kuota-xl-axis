@@ -20,12 +20,15 @@
             <div class="bg-indigo-600 p-2 rounded-lg">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </div>
-            <h1 class="text-xl font-bold">SiDompul XL/AXIS</h1>
+            <div>
+                <h1 class="text-3xl font-extrabold text-white">MasD VPNStore</h1>
+                <p class="text-slate-400 text-sm mt-1">Solusi Cek Kuota Terbaik Anda</p>
+            </div>
         </div>
 
         <div class="card p-5 rounded-2xl space-y-4">
             <div>
-                <h2 class="font-semibold text-lg">Cek Nomor XL / AXIS</h2>
+                <h2 class="font-semibold text-lg">SiDompul XL/AXIS</h2>
                 <p class="text-sm text-slate-400 mt-1">Masukkan nomor untuk mengecek info paket dan kuota.</p>
             </div>
             <div class="flex flex-col space-y-3">
@@ -67,6 +70,7 @@
     <script>
         const API_KEY = "MasDSukaCoL1";
 
+        // Fungsi Anti-Error untuk mengambil teks
         function getTxt(text, regex, fallback = "-") {
             const match = text.match(regex);
             return match ? match[1].trim() : fallback;
@@ -79,6 +83,7 @@
                 return;
             }
 
+            // Otomatis ubah awalan 62 menjadi 0
             if (inputNomor.startsWith("62")) {
                 inputNomor = "0" + inputNomor.slice(2);
             }
