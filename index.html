@@ -229,7 +229,7 @@
             document.getElementById('hasilKuota').classList.remove('hidden');
         }
 
-        // --- LOGIKA API FACEBOOK DOWNLOADER (ULTIMATE DETEKTIF) ---
+        // --- LOGIKA API FACEBOOK DOWNLOADER (FINAL FIX) ---
         async function downloadFB() {
             let inputUrl = document.getElementById('inputFbUrl').value;
             if (!inputUrl) { alert("Masukkan Link Facebook terlebih dahulu!"); return; }
@@ -246,7 +246,6 @@
 
                 const json = await response.json();
 
-                // Kita longgarkan pengecekannya
                 if (json.success && json.data) {
                     
                     document.getElementById('fbTitle').innerText = (json.data.api && json.data.api.title) ? json.data.api.title : "Video Facebook";
@@ -262,7 +261,7 @@
                     let audioUrl = "";
                     let duration = "-";
 
-                    // Jurus 1: Cek di mediaItems dengan huruf kecil/besar sembarang
+                    // Jurus 1: Cek di mediaItems (Untuk format video panjang)
                     if (json.data.mediaItems && Array.isArray(json.data.mediaItems)) {
                         json.data.mediaItems.forEach(item => {
                             let typeStr = String(item.type || "").toLowerCase();
@@ -275,11 +274,10 @@
                             }
                         });
                     } 
-                    // Jurus 2: Kalau Dinns ganti struktur tiba-tiba
-                    else if (json.data.url) {
-                        hdVideoUrl = json.data.url;
-                    } else if (json.data.video) {
-                        hdVideoUrl = json.data.video;
+                    
+                    // JURUS PAMUNGKAS: Ambil dari previewUrl (Untuk format Reels/Shorts)
+                    if (!hdVideoUrl && json.data.api && json.data.api.previewUrl) {
+                        hdVideoUrl = json.data.api.previewUrl;
                     }
 
                     document.getElementById('fbDur').innerText = duration;
@@ -293,10 +291,8 @@
                         linkDiv.innerHTML += `<a href="${audioUrl}" target="_blank" class="block w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-3 px-4 rounded-lg text-center transition-colors border border-slate-600 mt-2">🎵 Download Audio Saja</a>`;
                     }
 
-                    // Kalau masih gagal juga, TAMPILKAN ISI MENTAHNYA KE LAYAR!
                     if (!hdVideoUrl && !audioUrl) {
-                        const isiMentah = JSON.stringify(json.data).substring(0, 300); // Ambil 300 huruf pertama biar layar ga kepenuhan
-                        alert("API sukses, tapi link disembunyikan. Ini isi mentah dari server Dinns:\n\n" + isiMentah + "...");
+                        alert("Maaf, video ini diprivasi sangat ketat atau formatnya tidak didukung oleh server Dinns.");
                         return;
                     }
 
@@ -311,6 +307,7 @@
                 document.getElementById('btnFbCek').disabled = false;
             }
         }
+
 
     </script>
 </body>
