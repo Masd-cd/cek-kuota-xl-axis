@@ -68,8 +68,14 @@
         const API_KEY = "MasDSukaCoL1";
 
         async function cekKuota() {
-            const inputNomor = document.getElementById('inputNomor').value;
+                async function cekKuota() {
+            let inputNomor = document.getElementById('inputNomor').value;
             if (!inputNomor) return alert("Masukkan nomor HP terlebih dahulu!");
+
+            // Otomatis ubah awalan 62 menjadi 0 agar API tidak bingung
+            if (inputNomor.startsWith("62")) {
+                inputNomor = "0" + inputNomor.slice(2);
+            }
 
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('hasilInfo').classList.add('hidden');
@@ -77,10 +83,7 @@
             document.getElementById('btnCek').disabled = true;
 
             try {
-                // Link asli API
                 const targetUrl = `https://endpoint-dinns.vercel.app/api/tools/cekxl?apikey=${API_KEY}&number=${inputNomor}`;
-                
-                // JEMBATAN BARU (Corsproxy.io) - Biasanya lebih stabil
                 const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
                 
                 const response = await fetch(proxyUrl);
@@ -89,7 +92,9 @@
                 if (json.success && json.data && json.data.result) {
                     parsingData(json.data.result);
                 } else {
-                    alert("Gagal mengecek nomor. Pastikan nomor valid atau API sedang gangguan.");
+                    // TAMPILKAN ALASAN ASLI DARI SERVER
+                    const alasan = json.message || json.result || "Tidak ada respon spesifik dari server";
+                    alert("Ditolak oleh Server API:\n" + alasan);
                 }
             } catch (error) {
                 console.error(error);
@@ -99,6 +104,7 @@
                 document.getElementById('btnCek').disabled = false;
             }
         }
+
 
         function parsingData(text) {
             // Kita bersihkan dulu teksnya dari karakter aneh yang mungkin merusak Regex
