@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiDompul - MasD VPNStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .progress-bar-container { width: 100%; background-color: #334155; border-radius: 9999px; height: 8px; overflow: hidden; }
+        .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease; }
+        
+        .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex justify-center p-4">
+
+    <div class="w-full max-w-md space-y-4 mt-4 fade-in-up">
+        
+        <a href="index.html" class="inline-flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span>Kembali ke Menu</span>
+        </a>
+
+        <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20 border-indigo-500/20">
+            <div>
+                <h2 class="font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-cyan-300 to-white">SiDompul XL/AXIS</h2>
+                <p class="text-sm text-slate-400 mt-1">Masukkan nomor untuk mengecek info paket dan kuota.</p>
+            </div>
+            <div class="flex flex-col space-y-3 mt-2">
+                <input type="number" id="inputNomor" placeholder="Contoh: 0877...." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
+                <button id="btnCek" onclick="cekKuota()" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-lg hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] active:scale-95 transition-all text-center w-full">Cek Nomor</button>
+            </div>
+        </div>
+
+        <div id="loading" class="hidden text-center text-slate-400 py-4">
+            <svg class="animate-spin h-8 w-8 mx-auto text-indigo-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p>Mengecek data ke server...</p>
+        </div>
+
+        <div id="hasilInfo" class="card p-5 rounded-2xl space-y-4 hidden shadow-lg shadow-black/20">
+            <h3 class="font-bold text-lg border-b border-slate-700 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300">Info Pelanggan</h3>
+            <div class="grid grid-cols-2 gap-3 text-sm" id="infoGrid"></div>
+        </div>
+
+        <div id="hasilKuota" class="card p-5 rounded-2xl space-y-4 hidden shadow-lg shadow-black/20">
+            <h3 class="font-bold text-lg border-b border-slate-700 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300">Paket & Kuota</h3>
+            <div id="listKuota" class="space-y-4"></div>
+        </div>
+
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools</p>
+    </div>
+
+    <script>
+        const API_KEY = "MasDSukaCoL1";
+
+        function getTxt(text, regex, fallback = "-") {
+            const match = text.match(regex);
+            return match ? match[1].trim() : fallback;
+        }
+
+        async function cekKuota() {
+            let inputNomor = document.getElementById('inputNomor').value;
+            if (!inputNomor) { alert("Masukkan nomor HP terlebih dahulu!"); return; }
+            if (inputNomor.startsWith("62")) { inputNomor = "0" + inputNomor.slice(2); }
+
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('hasilInfo').classList.add('hidden');
+            document.getElementById('hasilKuota').classList.add('hidden');
+            document.getElementById('btnCek').disabled = true;
+
+            try {
+                const targetUrl = `/api/proxy-xl?apikey=${API_KEY}&number=${inputNomor}`;
+                const response = await fetch(targetUrl);
+                const json = await response.json();
+
+                if (json.success && json.data && json.data.result) {
+                    parsingData(json.data.result);
+                } else {
+                    const alasan = json.message || json.result || json.error || "Gagal ngecek server.";
+                    alert("Ditolak oleh Server:\n" + alasan);
+                }
+            } catch (error) {
+                alert("Terjadi kesalahan jaringan!");
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('btnCek').disabled = false;
+            }
+        }
+
+        function parsingData(text) {
+            const infoMap = [
+                { label: "MSISDN", val: getTxt(text, /MSISDN: (.*)/) },
+                { label: "Operator", val: getTxt(text, /Tipe Kartu: (.*)/) },
+                { label: "Status 4G", val: getTxt(text, /Status 4G: (.*)/) },
+                { label: "Umur Kartu", val: getTxt(text, /Umur Kartu: (.*)/) },
+                { label: "Masa Aktif", val: getTxt(text, /Masa Aktif: (.*)/), class: "text-green-400" },
+                { label: "Masa Tenggang", val: getTxt(text, /Masa Berakhir Tenggang: (.*)/), class: "text-red-400" },
+                { label: "Dukcapil", val: getTxt(text, /Status Dukcapil: (.*)/), class: "text-indigo-300" },
+                { label: "VoLTE", val: `Device:${getTxt(text, /Status Volte Device: (.*)/)} Area:${getTxt(text, /Status Volte Area: (.*)/)} SIM:${getTxt(text, /Status Volte Simcard: (.*)/)}`, class: "text-xs" }
+            ];
+
+            let infoHtml = "";
+            infoMap.forEach(item => {
+                infoHtml += `<div class="text-slate-400">${item.label}</div><div class="font-semibold text-right ${item.class || ''}">${item.val}</div>`;
+            });
+            document.getElementById('infoGrid').innerHTML = infoHtml;
+
+            const listKuotaDiv = document.getElementById('listKuota');
+            listKuotaDiv.innerHTML = ""; 
+
+            if (text.includes("batas maksimal")) {
+                listKuotaDiv.innerHTML = `<div class="bg-yellow-900/30 border border-yellow-700 p-4 rounded-xl text-sm text-yellow-400">⚠️ Batas maksimal 5x cek dalam 3 jam.</div>`;
+            } else {
+                const blokKuota = text.split(/🎁 Quota: /).slice(1);
+                if(blokKuota.length === 0) { listKuotaDiv.innerHTML = "<p class='text-sm text-slate-400 text-center'>Tidak ada paket.</p>"; }
+                
+                blokKuota.forEach(blok => {
+                    const parts = blok.split(/🎁 Benefit: /);
+                    const namaPaket = parts[0].split('\n')[0].trim();
+                    const exp = getTxt(parts[0], /Aktif Hingga: (.*)/);
+                    let cardHtml = `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4 transition-all hover:border-indigo-500/50"><h4 class="font-semibold text-sm mb-2 text-indigo-300">${namaPaket}</h4><div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 inline-block px-2 py-1 rounded mb-4">⏳ Exp: ${exp}</div><div class="space-y-4">`;
+
+                    if (parts.length > 1) {
+                        parts.slice(1).forEach(b => {
+                            const benefitName = b.split('\n')[0].trim();
+                            const totalK = getTxt(b, /🎁 Kuota: (.*)/, "0");
+                            const sisaK = getTxt(b, /Sisa Kuota: (.*)/, "0");
+                            let persen = Math.min((parseFloat(sisaK) || 0) / (parseFloat(totalK) || 1) * 100, 100);
+                            let warnaBar = persen < 20 ? "bg-red-500" : (b.includes("VOICE") ? "bg-emerald-500" : "bg-blue-500");
+                            cardHtml += `<div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400 truncate pr-2">${benefitName}</span><span class="font-bold">${sisaK} / ${totalK}</span></div><div class="progress-bar-container"><div class="progress-bar ${warnaBar}" style="width: ${persen}%;"></div></div></div>`;
+                        });
+                    }
+                    listKuotaDiv.innerHTML += cardHtml + `</div></div>`;
+                });
+            }
+            document.getElementById('hasilInfo').classList.remove('hidden');
+            document.getElementById('hasilKuota').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
