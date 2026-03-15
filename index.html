@@ -229,7 +229,7 @@
             document.getElementById('hasilKuota').classList.remove('hidden');
         }
 
-        // --- LOGIKA API FACEBOOK DOWNLOADER (VERSI VERCEL PROXY) ---
+        // --- LOGIKA API FACEBOOK DOWNLOADER (MODE DETEKTIF) ---
         async function downloadFB() {
             let inputUrl = document.getElementById('inputFbUrl').value;
             if (!inputUrl) { alert("Masukkan Link Facebook terlebih dahulu!"); return; }
@@ -239,10 +239,16 @@
             document.getElementById('btnFbCek').disabled = true;
 
             try {
-                // KITA PAKAI JEMBATAN VERCEL LAGI (ANTI BLOKIR & LEBIH CEPAT)
-                const targetUrl = `/api/proxy-dl/facebook?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
+                // Kita panggil jalur khusus FB yang baru dibuat di vercel.json
+                const targetUrl = `/api/proxy-fb?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
                 
                 const response = await fetch(targetUrl);
+                
+                // DETEKTIF: Kalau Vercel gagal nyambung, tampilkan kode errornya
+                if (!response.ok) {
+                    throw new Error(`Jembatan Vercel Error (HTTP ${response.status}). Cek vercel.json!`);
+                }
+
                 const json = await response.json();
 
                 if (json.success && json.data && json.data.api.status === "OK") {
@@ -279,16 +285,18 @@
 
                     document.getElementById('hasilFb').classList.remove('hidden');
                 } else {
-                    alert("Gagal memproses link. Pastikan link video publik atau coba lagi nanti.");
+                    alert("Gagal memproses link! Pesan Server: " + (json.message || "Data API tidak sesuai."));
                 }
             } catch (error) {
-                console.error(error);
-                alert("Terjadi kesalahan jaringan atau video tidak ditemukan.");
+                console.error("LOG ERROR ASLI:", error);
+                // Menampilkan error langsung ke layar agar kita tahu penyebab pastinya
+                alert("Detail Error:\n" + error.message);
             } finally {
                 document.getElementById('loadingFb').classList.add('hidden');
                 document.getElementById('btnFbCek').disabled = false;
             }
         }
+
 
     </script>
 </body>
