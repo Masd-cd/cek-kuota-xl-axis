@@ -229,7 +229,7 @@
             document.getElementById('hasilKuota').classList.remove('hidden');
         }
 
-        // --- LOGIKA API FACEBOOK DOWNLOADER BARU ---
+        // --- LOGIKA API FACEBOOK DOWNLOADER (VERSI VERCEL PROXY) ---
         async function downloadFB() {
             let inputUrl = document.getElementById('inputFbUrl').value;
             if (!inputUrl) { alert("Masukkan Link Facebook terlebih dahulu!"); return; }
@@ -239,20 +239,17 @@
             document.getElementById('btnFbCek').disabled = true;
 
             try {
-                // Kita gunakan AllOrigins (Proxy) karena ini URL eksternal baru yang belum di daftarkan di vercel.json
-                const targetUrl = `https://endpoint-dinns.vercel.app/api/download/facebook?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                // KITA PAKAI JEMBATAN VERCEL LAGI (ANTI BLOKIR & LEBIH CEPAT)
+                const targetUrl = `/api/proxy-dl/facebook?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
                 
-                const response = await fetch(proxyUrl);
+                const response = await fetch(targetUrl);
                 const json = await response.json();
 
                 if (json.success && json.data && json.data.api.status === "OK") {
-                    // Masukkan Data ke UI
                     document.getElementById('fbTitle').innerText = json.data.api.title || "Video Facebook";
                     document.getElementById('fbThumb').src = json.data.api.imagePreviewUrl;
                     document.getElementById('fbViews').innerText = json.data.mediaStats.viewsCount || "-";
                     
-                    // Filter array 'mediaItems' untuk mencari video berkualitas tertinggi (HD) dan Audio
                     const media = json.data.mediaItems;
                     let hdVideoUrl = "";
                     let audioUrl = "";
@@ -260,7 +257,7 @@
 
                     media.forEach(item => {
                         if (item.type === "Video") {
-                            hdVideoUrl = item.mediaUrl; // Karena di array resolusi paling tinggi ada di posisi bawah
+                            hdVideoUrl = item.mediaUrl; 
                             duration = item.mediaDuration;
                         }
                         if (item.type === "Audio") {
@@ -270,9 +267,8 @@
 
                     document.getElementById('fbDur').innerText = duration;
 
-                    // Buat Tombol Download
                     const linkDiv = document.getElementById('fbLinks');
-                    linkDiv.innerHTML = ""; // Bersihkan tombol lama
+                    linkDiv.innerHTML = ""; 
 
                     if(hdVideoUrl) {
                         linkDiv.innerHTML += `<a href="${hdVideoUrl}" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-md">📽️ Download Video (HD)</a>`;
@@ -293,6 +289,7 @@
                 document.getElementById('btnFbCek').disabled = false;
             }
         }
+
     </script>
 </body>
 </html>
