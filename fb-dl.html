@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FB Downloader - MasD VPNStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex justify-center p-4">
+
+    <div class="w-full max-w-md space-y-4 mt-4 fade-in-up">
+        
+        <a href="downloader.html" class="inline-flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span>Kembali ke Pilihan</span>
+        </a>
+
+        <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20 border-blue-500/30">
+            <div class="flex items-center space-x-3 mb-2">
+                <div class="bg-blue-600 p-2 rounded-lg"><svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M22.675 0H1.325C.593 0 0 .593 0 1.325v21.351C0 23.407.593 24 1.325 24H12.82v-9.294H9.692v-3.622h3.128V8.413c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.325V1.325C24 .593 23.407 0 22.675 0z"/></svg></div>
+                <h2 class="font-bold text-xl text-white">Facebook DL</h2>
+            </div>
+            <p class="text-sm text-slate-400">Tempelkan link video/reels Facebook di bawah ini.</p>
+            <div class="flex flex-col space-y-3 mt-2">
+                <input type="url" id="inputFbUrl" placeholder="Contoh: https://www.facebook.com/share/r/..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                <button id="btnFbCek" onclick="downloadFB()" class="bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-3 px-6 rounded-lg hover:shadow-[0_0_15px_rgba(37,99,235,0.4)] active:scale-95 transition-all text-center w-full">Cari Video</button>
+            </div>
+        </div>
+
+        <div id="loadingFb" class="hidden text-center text-slate-400 py-4">
+            <svg class="animate-spin h-8 w-8 mx-auto text-blue-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p>Mencari video FB...</p>
+        </div>
+
+        <div id="hasilFb" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-blue-500/20">
+            <div class="w-full h-48 bg-slate-800 rounded-xl overflow-hidden mb-4 relative">
+                <img id="fbThumb" src="" alt="Thumbnail" class="w-full h-full object-cover opacity-80">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm truncate drop-shadow-md" id="fbTitle">Judul Video</div>
+            </div>
+            <div class="flex items-center justify-between text-xs text-slate-400 mb-4 bg-slate-800/50 p-2 rounded-lg border border-slate-700">
+                <div class="flex flex-col"><span class="uppercase tracking-wider">Durasi</span><span id="fbDur" class="text-white font-bold">-</span></div>
+                <div class="flex flex-col text-right"><span class="uppercase tracking-wider">Views</span><span id="fbViews" class="text-white font-bold">-</span></div>
+            </div>
+            <div class="space-y-2" id="fbLinks">
+                </div>
+        </div>
+        
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools by Dinns</p>
+    </div>
+
+    <script>
+        const API_KEY = "MasDSukaCoL1";
+
+        async function downloadFB() {
+            let inputUrl = document.getElementById('inputFbUrl').value;
+            if (!inputUrl) { alert("Masukkan Link Facebook terlebih dahulu!"); return; }
+
+            document.getElementById('loadingFb').classList.remove('hidden');
+            document.getElementById('hasilFb').classList.add('hidden');
+            document.getElementById('btnFbCek').disabled = true;
+
+            try {
+                const targetUrl = `/api/proxy-fb?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
+                const response = await fetch(targetUrl);
+                
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+
+                const json = await response.json();
+
+                if (json.success && json.data) {
+                    
+                    document.getElementById('fbTitle').innerText = (json.data.api && json.data.api.title) ? json.data.api.title : "Video Facebook";
+                    document.getElementById('fbThumb').src = (json.data.api && json.data.api.imagePreviewUrl) ? json.data.api.imagePreviewUrl : "";
+                    
+                    let views = "-";
+                    if (json.data.mediaStats && json.data.mediaStats.viewsCount) {
+                        views = json.data.mediaStats.viewsCount;
+                    }
+                    document.getElementById('fbViews').innerText = views;
+                    
+                    let hdVideoUrl = "";
+                    let audioUrl = "";
+                    let duration = "-";
+
+                    // Ambil dari mediaItems
+                    if (json.data.mediaItems && Array.isArray(json.data.mediaItems)) {
+                        json.data.mediaItems.forEach(item => {
+                            let typeStr = String(item.type || "").toLowerCase();
+                            if (typeStr.includes("video")) {
+                                hdVideoUrl = item.mediaUrl; 
+                                duration = item.mediaDuration || duration;
+                            }
+                            if (typeStr.includes("audio")) {
+                                audioUrl = item.mediaUrl;
+                            }
+                        });
+                    } 
+                    
+                    // Ambil dari previewUrl kalau mediaItems kosong
+                    if (!hdVideoUrl && json.data.api && json.data.api.previewUrl) {
+                        hdVideoUrl = json.data.api.previewUrl;
+                    }
+
+                    document.getElementById('fbDur').innerText = duration;
+                    const linkDiv = document.getElementById('fbLinks');
+                    linkDiv.innerHTML = ""; 
+
+                    if(hdVideoUrl) {
+                        linkDiv.innerHTML += `
+                        <a href="${hdVideoUrl}" target="_blank" class="block w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-md">📽️ Download Video</a>
+                        <p class="text-[11px] text-slate-400 text-center mt-1 mb-2">💡 Tips: Jika video malah terputar, klik ikon titik tiga (⋮) di layar lalu pilih Download.</p>
+                        `;
+                    }
+                    if(audioUrl) {
+                        linkDiv.innerHTML += `<a href="${audioUrl}" target="_blank" class="block w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-3 px-4 rounded-lg text-center transition-colors border border-slate-600 mt-2">🎵 Download Audio Saja</a>`;
+                    }
+
+                    if (!hdVideoUrl && !audioUrl) {
+                        alert("Maaf, video ini diprivasi atau formatnya tidak didukung.");
+                        return;
+                    }
+
+                    document.getElementById('hasilFb').classList.remove('hidden');
+                } else {
+                    alert("Gagal memproses link! Pesan Server: " + (json.message || "Data API tidak sesuai."));
+                }
+            } catch (error) {
+                alert("Detail Error:\n" + error.message);
+            } finally {
+                document.getElementById('loadingFb').classList.add('hidden');
+                document.getElementById('btnFbCek').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
