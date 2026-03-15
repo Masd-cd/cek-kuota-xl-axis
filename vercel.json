@@ -7,6 +7,10 @@
     {
       "source": "/api/proxy-fb",
       "destination": "https://endpoint-dinns.vercel.app/api/download/facebook"
+    },
+    {
+      "source": "/api/proxy-sholat",
+      "destination": "https://endpoint-dinns.vercel.app/api/search/jadwalsholat"
     }
   ]
 }
