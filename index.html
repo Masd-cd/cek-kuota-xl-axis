@@ -10,15 +10,20 @@
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .progress-bar-container { width: 100%; background-color: #334155; border-radius: 9999px; height: 8px; overflow: hidden; }
         .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease; }
-        /* Animasi Transisi Halaman */
-        .page-transition { transition: opacity 0.3s ease, transform 0.3s ease; }
-        .page-hidden { opacity: 0; transform: scale(0.95); pointer-events: none; position: absolute; top: 0; left: 0; width: 100%; }
-        .page-active { opacity: 1; transform: scale(1); position: relative; }
+        
+        /* Animasi Transisi Baru: Super Mulus Anti Glitch */
+        .fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex justify-center p-4 relative">
+<body class="font-sans antialiased min-h-screen flex justify-center p-4">
 
-    <div class="w-full max-w-md space-y-4 mt-4 relative">
+    <div class="w-full max-w-md space-y-4 mt-4">
         
         <div class="flex flex-col items-center justify-center mb-8 mt-4">
             <div class="bg-indigo-600/20 p-3 rounded-2xl border border-indigo-500/30 mb-4 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
@@ -28,7 +33,7 @@
             <p class="text-slate-400 text-sm mt-2 font-medium tracking-wide">Premium All-in-One Tools</p>
         </div>
 
-        <div id="view-dashboard" class="page-transition page-active space-y-4">
+        <div id="view-dashboard" class="block fade-in-up space-y-4">
             <h2 class="text-lg font-bold text-white mb-3">Pilih Layanan</h2>
             <div class="grid grid-cols-1 gap-4">
                 
@@ -68,8 +73,8 @@
             </div>
         </div>
 
-        <div id="view-sidompul" class="page-transition page-hidden space-y-4">
-            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+        <div id="view-sidompul" class="hidden space-y-4">
+            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span>Kembali</span>
             </button>
@@ -86,10 +91,7 @@
             </div>
 
             <div id="loading" class="hidden text-center text-slate-400 py-4">
-                <svg class="animate-spin h-8 w-8 mx-auto text-cyan-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
+                <svg class="animate-spin h-8 w-8 mx-auto text-cyan-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 <p>Mengecek data ke server...</p>
             </div>
 
@@ -104,8 +106,8 @@
             </div>
         </div>
 
-        <div id="view-downloader" class="page-transition page-hidden space-y-4">
-            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+        <div id="view-downloader" class="hidden space-y-4">
+            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span>Kembali</span>
             </button>
@@ -131,8 +133,8 @@
             </div>
         </div>
 
-        <div id="view-sholat" class="page-transition page-hidden space-y-4">
-            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+        <div id="view-sholat" class="hidden space-y-4">
+            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 <span>Kembali</span>
             </button>
@@ -146,21 +148,30 @@
     </div>
 
     <script>
-        // --- LOGIKA PINDAH HALAMAN (SPA) ---
+        // --- LOGIKA PINDAH HALAMAN BEBAS GLITCH ---
         function switchView(viewId) {
-            // Sembunyikan semua halaman
-            document.getElementById('view-dashboard').classList.replace('page-active', 'page-hidden');
-            document.getElementById('view-sidompul').classList.replace('page-active', 'page-hidden');
-            document.getElementById('view-downloader').classList.replace('page-active', 'page-hidden');
-            document.getElementById('view-sholat').classList.replace('page-active', 'page-hidden');
+            // 1. Daftar semua ID halaman yang ada
+            const views = ['view-dashboard', 'view-sidompul', 'view-downloader', 'view-sholat'];
+
+            // 2. Sembunyikan SEMUA halaman & copot animasinya
+            views.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('hidden');
+                el.classList.remove('block', 'fade-in-up');
+            });
+
+            // 3. Tampilkan hanya halaman yang diminta
+            const targetView = document.getElementById(viewId);
+            targetView.classList.remove('hidden');
+            targetView.classList.add('block');
             
-            // Tampilkan halaman yang dipilih
+            // 4. Trigger animasi sedikit delay agar me-reset CSS
             setTimeout(() => {
-                document.getElementById(viewId).classList.replace('page-hidden', 'page-active');
-            }, 50); // Jeda sedikit agar animasinya mulus
+                targetView.classList.add('fade-in-up');
+            }, 10);
         }
 
-        // --- LOGIKA API SIDOMPUL (Sama seperti sebelumnya) ---
+        // --- LOGIKA API SIDOMPUL ---
         const API_KEY = "MasDSukaCoL1";
 
         function getTxt(text, regex, fallback = "-") {
@@ -198,7 +209,6 @@
         }
 
         function parsingData(text) {
-            // Parsing Info Pelanggan
             const infoMap = [
                 { label: "MSISDN", val: getTxt(text, /MSISDN: (.*)/) },
                 { label: "Operator", val: getTxt(text, /Tipe Kartu: (.*)/) },
@@ -216,7 +226,6 @@
             });
             document.getElementById('infoGrid').innerHTML = infoHtml;
 
-            // Parsing Kuota (Disingkat agar rapi)
             const listKuotaDiv = document.getElementById('listKuota');
             listKuotaDiv.innerHTML = ""; 
 
@@ -230,7 +239,7 @@
                     const parts = blok.split(/🎁 Benefit: /);
                     const namaPaket = parts[0].split('\n')[0].trim();
                     const exp = getTxt(parts[0], /Aktif Hingga: (.*)/);
-                    let cardHtml = `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4"><h4 class="font-semibold text-sm mb-2 text-indigo-300">${namaPaket}</h4><div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 inline-block px-2 py-1 rounded mb-4">⏳ Exp: ${exp}</div><div class="space-y-4">`;
+                    let cardHtml = `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4 transition-all hover:border-indigo-500/50"><h4 class="font-semibold text-sm mb-2 text-indigo-300">${namaPaket}</h4><div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 inline-block px-2 py-1 rounded mb-4">⏳ Exp: ${exp}</div><div class="space-y-4">`;
 
                     if (parts.length > 1) {
                         parts.slice(1).forEach(b => {
