@@ -3,71 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Kuota XL & AXIS</title>
+    <title>MasD VPNStore - Premium Tools</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .progress-bar-container { width: 100%; background-color: #334155; border-radius: 9999px; height: 8px; overflow: hidden; }
         .progress-bar { height: 100%; border-radius: 9999px; transition: width 0.5s ease; }
+        /* Animasi Transisi Halaman */
+        .page-transition { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .page-hidden { opacity: 0; transform: scale(0.95); pointer-events: none; position: absolute; top: 0; left: 0; width: 100%; }
+        .page-active { opacity: 1; transform: scale(1); position: relative; }
     </style>
 </head>
-<body class="font-sans antialiased min-h-screen flex justify-center p-4">
+<body class="font-sans antialiased min-h-screen flex justify-center p-4 relative">
 
-    <div class="w-full max-w-md space-y-4 mt-4">
+    <div class="w-full max-w-md space-y-4 mt-4 relative">
         
         <div class="flex flex-col items-center justify-center mb-8 mt-4">
             <div class="bg-indigo-600/20 p-3 rounded-2xl border border-indigo-500/30 mb-4 shadow-[0_0_15px_rgba(99,102,241,0.3)]">
-                <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
+                <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
             </div>
             <h1 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400 tracking-tight">MasD VPNStore</h1>
-            <p class="text-slate-400 text-sm mt-2 font-medium tracking-wide">Checker Tools</p>
+            <p class="text-slate-400 text-sm mt-2 font-medium tracking-wide">Premium All-in-One Tools</p>
         </div>
 
-        <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20">
-            <div>
-                <h2 class="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-cyan-200 to-white">SiDompul XL/AXIS</h2>
-                <p class="text-sm text-slate-400 mt-1">Masukkan nomor untuk mengecek info paket dan kuota.</p>
+        <div id="view-dashboard" class="page-transition page-active space-y-4">
+            <h2 class="text-lg font-bold text-white mb-3">Pilih Layanan</h2>
+            <div class="grid grid-cols-1 gap-4">
+                
+                <div onclick="switchView('view-sidompul')" class="card p-5 rounded-2xl cursor-pointer hover:border-indigo-500/50 hover:shadow-[0_0_15px_rgba(99,102,241,0.2)] transition-all group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center space-x-4 relative z-10">
+                        <div class="bg-indigo-500/20 p-3 rounded-xl text-indigo-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg></div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg group-hover:text-indigo-300 transition-colors">SiDompul XL/AXIS</h3>
+                            <p class="text-xs text-slate-400 mt-1">Cek sisa kuota, masa aktif, dan info nomor.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div onclick="switchView('view-downloader')" class="card p-5 rounded-2xl cursor-pointer hover:border-cyan-500/50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] transition-all group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center space-x-4 relative z-10">
+                        <div class="bg-cyan-500/20 p-3 rounded-xl text-cyan-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg></div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg group-hover:text-cyan-300 transition-colors">Sosmed Downloader</h3>
+                            <p class="text-xs text-slate-400 mt-1">Download video TikTok, IG, FB tanpa watermark.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div onclick="switchView('view-sholat')" class="card p-5 rounded-2xl cursor-pointer hover:border-emerald-500/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center space-x-4 relative z-10">
+                        <div class="bg-emerald-500/20 p-3 rounded-xl text-emerald-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></div>
+                        <div>
+                            <h3 class="font-bold text-white text-lg group-hover:text-emerald-300 transition-colors">Jadwal Sholat</h3>
+                            <p class="text-xs text-slate-400 mt-1">Cek jadwal sholat akurat berdasarkan kota.</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-            <div class="flex flex-col space-y-3 mt-2">
-                <input type="number" id="inputNomor" placeholder="Contoh: 0877...." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all">
-                <button id="btnCek" onclick="cekKuota()" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-lg hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] active:scale-95 transition-all text-center w-full">Cek Nomor</button>
+        </div>
+
+        <div id="view-sidompul" class="page-transition page-hidden space-y-4">
+            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span>Kembali</span>
+            </button>
+
+            <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20">
+                <div>
+                    <h2 class="font-bold text-xl text-transparent bg-clip-text bg-gradient-to-r from-indigo-200 via-cyan-200 to-white">SiDompul XL/AXIS</h2>
+                    <p class="text-sm text-slate-400 mt-1">Masukkan nomor untuk mengecek info paket dan kuota.</p>
+                </div>
+                <div class="flex flex-col space-y-3 mt-2">
+                    <input type="number" id="inputNomor" placeholder="Contoh: 0877...." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all">
+                    <button id="btnCek" onclick="cekKuota()" class="bg-gradient-to-r from-indigo-500 via-blue-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-lg hover:shadow-[0_0_15px_rgba(6,182,212,0.4)] active:scale-95 transition-all text-center w-full">Cek Nomor</button>
+                </div>
+            </div>
+
+            <div id="loading" class="hidden text-center text-slate-400 py-4">
+                <svg class="animate-spin h-8 w-8 mx-auto text-cyan-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p>Mengecek data ke server...</p>
+            </div>
+
+            <div id="hasilInfo" class="card p-5 rounded-2xl space-y-4 hidden shadow-lg shadow-black/20">
+                <h3 class="font-bold text-lg border-b border-slate-700 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300">Info Pelanggan</h3>
+                <div class="grid grid-cols-2 gap-3 text-sm" id="infoGrid"></div>
+            </div>
+
+            <div id="hasilKuota" class="card p-5 rounded-2xl space-y-4 hidden shadow-lg shadow-black/20">
+                <h3 class="font-bold text-lg border-b border-slate-700 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300">Paket & Kuota</h3>
+                <div id="listKuota" class="space-y-4"></div>
             </div>
         </div>
 
-        <div id="loading" class="hidden text-center text-slate-400 py-4">
-            <svg class="animate-spin h-8 w-8 mx-auto text-cyan-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p>Mengecek data ke server...</p>
-        </div>
+        <div id="view-downloader" class="page-transition page-hidden space-y-4">
+            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span>Kembali</span>
+            </button>
 
-        <div id="hasilInfo" class="card p-5 rounded-2xl space-y-4 hidden shadow-lg shadow-black/20">
-            <h3 class="font-bold text-lg border-b border-slate-700 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300">Info Pelanggan</h3>
-            <div class="grid grid-cols-2 gap-3 text-sm">
-                <div class="text-slate-400">MSISDN</div><div class="font-semibold text-right" id="valMsisdn">-</div>
-                <div class="text-slate-400">Operator</div><div class="font-semibold text-right" id="valOp">-</div>
-                <div class="text-slate-400">Status 4G</div><div class="font-semibold text-right" id="val4g">-</div>
-                <div class="text-slate-400">Umur Kartu</div><div class="font-semibold text-right" id="valUmur">-</div>
-                <div class="text-slate-400">Masa Aktif</div><div class="font-semibold text-right text-green-400" id="valAktif">-</div>
-                <div class="text-slate-400">Masa Tenggang</div><div class="font-semibold text-right text-red-400" id="valTenggang">-</div>
-                <div class="text-slate-400">Dukcapil</div><div class="font-semibold text-right text-indigo-300" id="valDukcapil">-</div>
-                <div class="text-slate-400">VoLTE</div><div class="font-semibold text-right text-xs" id="valVolte">-</div>
+            <h2 class="text-lg font-bold text-white mb-3">Pilih Downloader</h2>
+            <div class="grid grid-cols-1 gap-3">
+                <div class="card p-4 rounded-xl flex items-center space-x-3 cursor-pointer hover:bg-slate-800 transition-colors">
+                    <span class="bg-cyan-900 text-cyan-400 text-xs font-bold px-2 py-1 rounded border border-cyan-700">GET</span>
+                    <span class="font-bold text-white">DOWNLOAD / tiktok</span>
+                </div>
+                <div class="card p-4 rounded-xl flex items-center space-x-3 cursor-pointer hover:bg-slate-800 transition-colors">
+                    <span class="bg-cyan-900 text-cyan-400 text-xs font-bold px-2 py-1 rounded border border-cyan-700">GET</span>
+                    <span class="font-bold text-white">DOWNLOAD / instagram</span>
+                </div>
+                <div class="card p-4 rounded-xl flex items-center space-x-3 cursor-pointer hover:bg-slate-800 transition-colors">
+                    <span class="bg-cyan-900 text-cyan-400 text-xs font-bold px-2 py-1 rounded border border-cyan-700">GET</span>
+                    <span class="font-bold text-white">DOWNLOAD / facebook</span>
+                </div>
+                <div class="card p-4 rounded-xl flex items-center space-x-3 cursor-pointer hover:bg-slate-800 transition-colors">
+                    <span class="bg-cyan-900 text-cyan-400 text-xs font-bold px-2 py-1 rounded border border-cyan-700">GET</span>
+                    <span class="font-bold text-white">DOWNLOAD / capcut</span>
+                </div>
             </div>
         </div>
 
-        <div id="hasilKuota" class="card p-5 rounded-2xl space-y-4 hidden shadow-lg shadow-black/20">
-            <h3 class="font-bold text-lg border-b border-slate-700 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 to-cyan-300">Paket & Kuota</h3>
-            <div id="listKuota" class="space-y-4"></div>
+        <div id="view-sholat" class="page-transition page-hidden space-y-4">
+            <button onclick="switchView('view-dashboard')" class="flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                <span>Kembali</span>
+            </button>
+            <div class="card p-5 rounded-2xl text-center space-y-3">
+                <h2 class="font-bold text-xl text-emerald-400">Jadwal Sholat</h2>
+                <p class="text-slate-400 text-sm">Fitur ini sedang dalam tahap pengembangan (Coming Soon).</p>
+            </div>
         </div>
-        
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with Dinns API</p>
+
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools</p>
     </div>
 
     <script>
+        // --- LOGIKA PINDAH HALAMAN (SPA) ---
+        function switchView(viewId) {
+            // Sembunyikan semua halaman
+            document.getElementById('view-dashboard').classList.replace('page-active', 'page-hidden');
+            document.getElementById('view-sidompul').classList.replace('page-active', 'page-hidden');
+            document.getElementById('view-downloader').classList.replace('page-active', 'page-hidden');
+            document.getElementById('view-sholat').classList.replace('page-active', 'page-hidden');
+            
+            // Tampilkan halaman yang dipilih
+            setTimeout(() => {
+                document.getElementById(viewId).classList.replace('page-hidden', 'page-active');
+            }, 50); // Jeda sedikit agar animasinya mulus
+        }
+
+        // --- LOGIKA API SIDOMPUL (Sama seperti sebelumnya) ---
         const API_KEY = "MasDSukaCoL1";
 
         function getTxt(text, regex, fallback = "-") {
@@ -77,14 +170,8 @@
 
         async function cekKuota() {
             let inputNomor = document.getElementById('inputNomor').value;
-            if (!inputNomor) {
-                alert("Masukkan nomor HP terlebih dahulu!");
-                return;
-            }
-
-            if (inputNomor.startsWith("62")) {
-                inputNomor = "0" + inputNomor.slice(2);
-            }
+            if (!inputNomor) { alert("Masukkan nomor HP terlebih dahulu!"); return; }
+            if (inputNomor.startsWith("62")) { inputNomor = "0" + inputNomor.slice(2); }
 
             document.getElementById('loading').classList.remove('hidden');
             document.getElementById('hasilInfo').classList.add('hidden');
@@ -93,19 +180,17 @@
 
             try {
                 const targetUrl = `/api/proxy-xl?apikey=${API_KEY}&number=${inputNomor}`;
-                
                 const response = await fetch(targetUrl);
                 const json = await response.json();
 
                 if (json.success && json.data && json.data.result) {
                     parsingData(json.data.result);
                 } else {
-                    const alasan = json.message || json.result || json.error || "Nomor tidak ditemukan atau server sibuk.";
-                    alert("Ditolak oleh Server API:\n" + alasan);
+                    const alasan = json.message || json.result || json.error || "Gagal ngecek server.";
+                    alert("Ditolak oleh Server:\n" + alasan);
                 }
             } catch (error) {
-                console.error(error);
-                alert("Terjadi kesalahan jaringan! Coba lagi beberapa saat lagi.");
+                alert("Terjadi kesalahan jaringan!");
             } finally {
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('btnCek').disabled = false;
@@ -113,79 +198,51 @@
         }
 
         function parsingData(text) {
-            const msisdn = getTxt(text, /MSISDN: (.*)/);
-            const tipe = getTxt(text, /Tipe Kartu: (.*)/);
-            const status4g = getTxt(text, /Status 4G: (.*)/);
-            const umur = getTxt(text, /Umur Kartu: (.*)/);
-            const aktif = getTxt(text, /Masa Aktif: (.*)/);
-            const tenggang = getTxt(text, /Masa Berakhir Tenggang: (.*)/);
-            const dukcapil = getTxt(text, /Status Dukcapil: (.*)/);
-            const volteDev = getTxt(text, /Status Volte Device: (.*)/);
-            const volteArea = getTxt(text, /Status Volte Area: (.*)/);
-            const volteSim = getTxt(text, /Status Volte Simcard: (.*)/);
+            // Parsing Info Pelanggan
+            const infoMap = [
+                { label: "MSISDN", val: getTxt(text, /MSISDN: (.*)/) },
+                { label: "Operator", val: getTxt(text, /Tipe Kartu: (.*)/) },
+                { label: "Status 4G", val: getTxt(text, /Status 4G: (.*)/) },
+                { label: "Umur Kartu", val: getTxt(text, /Umur Kartu: (.*)/) },
+                { label: "Masa Aktif", val: getTxt(text, /Masa Aktif: (.*)/), class: "text-green-400" },
+                { label: "Masa Tenggang", val: getTxt(text, /Masa Berakhir Tenggang: (.*)/), class: "text-red-400" },
+                { label: "Dukcapil", val: getTxt(text, /Status Dukcapil: (.*)/), class: "text-indigo-300" },
+                { label: "VoLTE", val: `Device:${getTxt(text, /Status Volte Device: (.*)/)} Area:${getTxt(text, /Status Volte Area: (.*)/)} SIM:${getTxt(text, /Status Volte Simcard: (.*)/)}`, class: "text-xs" }
+            ];
 
-            document.getElementById('valMsisdn').innerText = msisdn;
-            document.getElementById('valOp').innerText = tipe;
-            document.getElementById('val4g').innerText = status4g;
-            document.getElementById('valUmur').innerText = umur;
-            document.getElementById('valAktif').innerText = aktif;
-            document.getElementById('valTenggang').innerText = tenggang;
-            document.getElementById('valDukcapil').innerText = dukcapil;
-            document.getElementById('valVolte').innerText = `Device:${volteDev} Area:${volteArea} SIM:${volteSim}`;
+            let infoHtml = "";
+            infoMap.forEach(item => {
+                infoHtml += `<div class="text-slate-400">${item.label}</div><div class="font-semibold text-right ${item.class || ''}">${item.val}</div>`;
+            });
+            document.getElementById('infoGrid').innerHTML = infoHtml;
 
+            // Parsing Kuota (Disingkat agar rapi)
             const listKuotaDiv = document.getElementById('listKuota');
             listKuotaDiv.innerHTML = ""; 
 
             if (text.includes("batas maksimal")) {
-                const limitWarning = "⚠️ Anda telah mencapai batas maksimal pengecekan 5x dalam 3 jam untuk nomor yang sama. Silahkan melakukan pengecekan kembali dalam 3 jam kedepan.";
-                listKuotaDiv.innerHTML = `<div class="bg-yellow-900/30 border border-yellow-700 p-4 rounded-xl text-sm text-yellow-400">${limitWarning}</div>`;
+                listKuotaDiv.innerHTML = `<div class="bg-yellow-900/30 border border-yellow-700 p-4 rounded-xl text-sm text-yellow-400">⚠️ Batas maksimal 5x cek dalam 3 jam.</div>`;
             } else {
                 const blokKuota = text.split(/🎁 Quota: /).slice(1);
-                if(blokKuota.length === 0) {
-                    listKuotaDiv.innerHTML = "<p class='text-sm text-slate-400 italic text-center'>Tidak ada paket aktif.</p>";
-                }
+                if(blokKuota.length === 0) { listKuotaDiv.innerHTML = "<p class='text-sm text-slate-400 text-center'>Tidak ada paket.</p>"; }
+                
                 blokKuota.forEach(blok => {
                     const parts = blok.split(/🎁 Benefit: /);
-                    const headerPart = parts[0];
-                    const namaPaket = headerPart.split('\n')[0].trim();
-                    const exp = getTxt(headerPart, /Aktif Hingga: (.*)/);
-
-                    let cardHtml = `
-                        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm mb-4 transition-all hover:border-indigo-500/50">
-                            <h4 class="font-semibold text-sm mb-2 text-indigo-300">${namaPaket}</h4>
-                            <div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 inline-block px-2 py-1 rounded mb-4">⏳ Exp: ${exp}</div>
-                            <div class="space-y-4">`;
+                    const namaPaket = parts[0].split('\n')[0].trim();
+                    const exp = getTxt(parts[0], /Aktif Hingga: (.*)/);
+                    let cardHtml = `<div class="bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4"><h4 class="font-semibold text-sm mb-2 text-indigo-300">${namaPaket}</h4><div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 inline-block px-2 py-1 rounded mb-4">⏳ Exp: ${exp}</div><div class="space-y-4">`;
 
                     if (parts.length > 1) {
                         parts.slice(1).forEach(b => {
                             const benefitName = b.split('\n')[0].trim();
-                            const tipeKuota = getTxt(b, /Tipe Kuota: (.*)/, "DATA");
                             const totalK = getTxt(b, /🎁 Kuota: (.*)/, "0");
                             const sisaK = getTxt(b, /Sisa Kuota: (.*)/, "0");
-                            
-                            const totalA = parseFloat(totalK) || 1;
-                            const sisaA = parseFloat(sisaK) || 0;
-                            let persen = (sisaA / totalA) * 100;
-                            if(persen > 100) persen = 100;
-
-                            let warnaBar = "bg-blue-500";
-                            if (persen < 20) warnaBar = "bg-red-500";
-                            if (tipeKuota.includes("VOICE") || tipeKuota.includes("Nelp")) warnaBar = "bg-emerald-500"; 
-
-                            cardHtml += `
-                                <div>
-                                    <div class="flex justify-between text-xs mb-1">
-                                        <span class="text-slate-400 truncate pr-2">${benefitName}</span>
-                                        <span class="font-bold whitespace-nowrap">${sisaK} / ${totalK}</span>
-                                    </div>
-                                    <div class="progress-bar-container w-full bg-slate-700 rounded-full h-2">
-                                        <div class="progress-bar ${warnaBar} h-2 rounded-full" style="width: ${persen}%;"></div>
-                                    </div>
-                                </div>`;
+                            let persen = Math.min((parseFloat(sisaK) || 0) / (parseFloat(totalK) || 1) * 100, 100);
+                            let warnaBar = persen < 20 ? "bg-red-500" : (b.includes("VOICE") ? "bg-emerald-500" : "bg-blue-500");
+                            cardHtml += `<div><div class="flex justify-between text-xs mb-1"><span class="text-slate-400 truncate pr-2">${benefitName}</span><span class="font-bold">${sisaK} / ${totalK}</span></div><div class="progress-bar-container"><div class="progress-bar ${warnaBar}" style="width: ${persen}%;"></div></div></div>`;
                         });
                     }
-                    cardHtml += `</div></div>`;
-                    listKuotaDiv.innerHTML += cardHtml;
+                    listKuotaDiv.innerHTML += cardHtml + `</div></div>`;
                 });
             }
             document.getElementById('hasilInfo').classList.remove('hidden');
