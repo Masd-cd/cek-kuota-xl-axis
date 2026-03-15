@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cek Kuota XL Bypass</title>
+    <title>Cek Kuota XL & AXIS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f172a; color: #f8fafc; }
@@ -29,7 +29,7 @@
                 <p class="text-sm text-slate-400 mt-1">Masukkan nomor untuk mengecek info paket dan kuota.</p>
             </div>
             <div class="flex flex-col space-y-3">
-                <input type="number" id="inputNomor" placeholder="Contoh: 087712345678" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500">
+                <input type="number" id="inputNomor" placeholder="Contoh: 087..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-indigo-500">
                 <button id="btnCek" onclick="cekKuota()" class="bg-white text-slate-900 font-bold py-3 px-6 rounded-lg hover:bg-slate-200 transition text-center w-full">Cek Nomor</button>
             </div>
         </div>
@@ -80,21 +80,19 @@
                 // Link asli API
                 const targetUrl = `https://endpoint-dinns.vercel.app/api/tools/cekxl?apikey=${API_KEY}&number=${inputNomor}`;
                 
-                // Jembatan Proxy Baru (Raw)
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+                // JEMBATAN BARU (Corsproxy.io) - Biasanya lebih stabil
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
                 
                 const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error("Network response was not ok");
-                
                 const json = await response.json();
 
                 if (json.success && json.data && json.data.result) {
                     parsingData(json.data.result);
                 } else {
-                    alert("Gagal mengecek nomor. Pastikan nomor valid atau server sedang sibuk.");
+                    alert("Gagal mengecek nomor. Pastikan nomor valid atau API sedang gangguan.");
                 }
             } catch (error) {
-                console.error("Error Detail:", error);
+                console.error(error);
                 alert("Terjadi kesalahan jaringan! Coba lagi beberapa saat lagi.");
             } finally {
                 document.getElementById('loading').classList.add('hidden');
@@ -103,6 +101,9 @@
         }
 
         function parsingData(text) {
+            // Kita bersihkan dulu teksnya dari karakter aneh yang mungkin merusak Regex
+            const cleanText = text.replace(/📃|🎁|🌲|🍂|⚠️/g, "");
+
             const msisdn = text.match(/MSISDN: (.*)/)?.[1] || "-";
             const tipe = text.match(/Tipe Kartu: (.*)/)?.[1] || "-";
             const status4g = text.match(/Status 4G: (.*)/)?.[1] || "-";
@@ -126,13 +127,9 @@
             const listKuotaDiv = document.getElementById('listKuota');
             listKuotaDiv.innerHTML = ""; 
 
-            if (text.includes("batas maksimal") || text.includes("⚠️")) {
+            if (text.includes("batas maksimal")) {
                 const limitWarning = "⚠️ Anda telah mencapai batas maksimal pengecekan 5x dalam 3 jam untuk nomor yang sama. Silahkan melakukan pengecekan kembali dalam 3 jam kedepan.";
-                listKuotaDiv.innerHTML = `
-                    <div class="bg-yellow-900/30 border border-yellow-700 p-4 rounded-xl flex items-start space-x-3">
-                        <svg class="w-6 h-6 text-yellow-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                        <p class="text-sm text-yellow-400 leading-relaxed">${limitWarning}</p>
-                    </div>`;
+                listKuotaDiv.innerHTML = `<div class="bg-yellow-900/30 border border-yellow-700 p-4 rounded-xl text-sm text-yellow-400">${limitWarning}</div>`;
             } else {
                 const blokKuota = text.split(/🎁 Quota: /).slice(1);
                 if(blokKuota.length === 0) {
@@ -143,33 +140,36 @@
                     const headerPart = parts[0];
                     const namaPaket = headerPart.split('\n')[0].trim();
                     const exp = headerPart.match(/Aktif Hingga: (.*)/)?.[1] || "-";
+
                     let cardHtml = `
                         <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow-sm mb-4">
                             <h4 class="font-semibold text-sm mb-2 text-indigo-300">${namaPaket}</h4>
                             <div class="text-xs text-slate-300 bg-slate-900 border border-slate-700 inline-block px-2 py-1 rounded mb-4">⏳ Exp: ${exp}</div>
                             <div class="space-y-4">`;
+
                     if (parts.length > 1) {
                         parts.slice(1).forEach(b => {
                             const benefitName = b.split('\n')[0].trim();
                             const tipeKuota = b.match(/Tipe Kuota: (.*)/)?.[1] || "DATA";
-                            const totalKuotaText = b.match(/🎁 Kuota: (.*)/)?.[1] || "0";
-                            const sisaKuotaText = b.match(/Sisa Kuota: (.*)/)?.[1] || "0";
-                            const angkaTotal = parseFloat(totalKuotaText) || 1;
-                            const angkaSisa = parseFloat(sisaKuotaText) || 0;
-                            let persen = (angkaSisa / angkaTotal) * 100;
+                            const totalK = b.match(/🎁 Kuota: (.*)/)?.[1] || "0";
+                            const sisaK = b.match(/Sisa Kuota: (.*)/)?.[1] || "0";
+                            
+                            const totalA = parseFloat(totalK) || 1;
+                            const sisaA = parseFloat(sisaK) || 0;
+                            let persen = (sisaA / totalA) * 100;
                             if(persen > 100) persen = 100;
+
                             let warnaBar = "bg-blue-500";
                             if (persen < 20) warnaBar = "bg-red-500";
                             if (tipeKuota === "VOICE") warnaBar = "bg-emerald-500"; 
+
                             cardHtml += `
                                 <div>
                                     <div class="flex justify-between text-xs mb-1">
                                         <span class="text-slate-400 truncate pr-2">${benefitName}</span>
-                                        <span class="font-bold whitespace-nowrap">${sisaKuotaText} / ${totalKuotaText}</span>
+                                        <span class="font-bold whitespace-nowrap">${sisaK} / ${totalK}</span>
                                     </div>
-                                    <div class="progress-bar-container w-full bg-slate-700 rounded-full h-2">
-                                        <div class="progress-bar ${warnaBar} h-2 rounded-full" style="width: ${persen}%;"></div>
-                                    </div>
+                                    <div class="progress-bar-container"><div class="progress-bar ${warnaBar}" style="width: ${persen}%;"></div></div>
                                 </div>`;
                         });
                     }
