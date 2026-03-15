@@ -67,7 +67,6 @@
     <script>
         const API_KEY = "MasDSukaCoL1";
 
-        // Fungsi Anti-Error untuk mengambil teks
         function getTxt(text, regex, fallback = "-") {
             const match = text.match(regex);
             return match ? match[1].trim() : fallback;
@@ -80,7 +79,6 @@
                 return;
             }
 
-            // Otomatis ubah awalan 62 menjadi 0
             if (inputNomor.startsWith("62")) {
                 inputNomor = "0" + inputNomor.slice(2);
             }
@@ -91,10 +89,10 @@
             document.getElementById('btnCek').disabled = true;
 
             try {
-                const targetUrl = `https://endpoint-dinns.vercel.app/api/tools/cekxl?apikey=${API_KEY}&number=${inputNomor}`;
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+                // KITA PAKAI JEMBATAN PRIBADI VERCEL (SANGAT CEPAT & ANTI BLOKIR)
+                const targetUrl = `/api/proxy-xl?apikey=${API_KEY}&number=${inputNomor}`;
                 
-                const response = await fetch(proxyUrl);
+                const response = await fetch(targetUrl);
                 const json = await response.json();
 
                 if (json.success && json.data && json.data.result) {
