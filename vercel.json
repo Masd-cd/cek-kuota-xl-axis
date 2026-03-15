@@ -3,6 +3,10 @@
     {
       "source": "/api/proxy-xl",
       "destination": "https://endpoint-dinns.vercel.app/api/tools/cekxl"
+    },
+    {
+      "source": "/api/proxy-dl/:path*",
+      "destination": "https://endpoint-dinns.vercel.app/api/download/:path*"
     }
   ]
 }
