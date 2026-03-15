@@ -78,9 +78,17 @@
             document.getElementById('btnCek').disabled = true;
 
             try {
-                const url = `https://endpoint-dinns.vercel.app/api/tools/cekxl?apikey=${API_KEY}&number=${inputNomor}`;
-                const response = await fetch(url);
-                const json = await response.json();
+                // Link asli API kamu
+                const targetUrl = `https://endpoint-dinns.vercel.app/api/tools/cekxl?apikey=${API_KEY}&number=${inputNomor}`;
+                
+                // Jembatan Proxy agar tidak diblokir browser (CORS)
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+                
+                const response = await fetch(proxyUrl);
+                const result = await response.json();
+
+                // AllOrigins membungkus datanya di dalam "contents", jadi kita bongkar dulu
+                const json = JSON.parse(result.contents);
 
                 if (json.success && json.data && json.data.result) {
                     parsingData(json.data.result);
@@ -88,7 +96,8 @@
                     alert("Gagal mengecek nomor. Pastikan nomor valid atau API sedang gangguan.");
                 }
             } catch (error) {
-                alert("Terjadi kesalahan jaringan!");
+                console.error(error);
+                alert("Terjadi kesalahan jaringan! Coba lagi beberapa saat lagi.");
             } finally {
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('btnCek').disabled = false;
