@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/proxy-xl",
+      "destination": "https://endpoint-dinns.vercel.app/api/tools/cekxl"
+    }
+  ]
+}
