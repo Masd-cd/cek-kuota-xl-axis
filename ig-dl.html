@@ -77,7 +77,7 @@
                     // Karena formatnya array (bisa lebih dari 1 file), kita gunakan perulangan (forEach)
                     json.data.forEach((item, index) => {
                         let isVideo = item.url.includes(".mp4") || item.url.includes("dl=1");
-                        let btnText = isVideo ? "🎬 Download Video" : "📸 Download Foto";
+                        let btnText = isVideo ? "🎬 Download" : "📸 Download";
                         
                         hasilDiv.innerHTML += `
                         <div class="card p-4 rounded-2xl shadow-lg shadow-black/20 border-pink-500/20 mb-4 fade-in-up" style="animation-delay: ${index * 0.1}s">
