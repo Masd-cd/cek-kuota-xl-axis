@@ -11,6 +11,10 @@
     {
       "source": "/api/proxy-sholat",
       "destination": "https://endpoint-dinns.vercel.app/api/search/jadwalsholat"
+    },
+    {
+      "source": "/api/proxy-ig",
+      "destination": "https://endpoint-dinns.vercel.app/api/download/instagram"
     }
   ]
 }
