@@ -71,8 +71,7 @@
         
         <p class="text-center text-slate-600 text-xs mt-4 pb-4">Secured by MasD Enterprise Infrastructure</p>
     </div>
-
-        <script>
+    <script>
         function bukaMesinBawah() {
             let inputUrl = document.getElementById('inputYtUrl').value.trim();
             
@@ -83,7 +82,7 @@
 
             // 1. Trik Auto-Copy ke Clipboard HP
             navigator.clipboard.writeText(inputUrl).catch(err => {
-                console.log("Clipboard otomatis ditolak browser, pengguna harus copy manual");
+                console.log("Clipboard ditolak browser, copy manual diperlukan.");
             });
 
             // 2. Memunculkan kontainer MeTube
@@ -91,11 +90,8 @@
             container.classList.remove('hidden');
             container.classList.add('slide-down');
 
-            // 3. Load iframe (Tanpa ?url= karena MeTube tidak support)
-            let iframe = document.getElementById('metubeFrame');
-            if (!iframe.src) { // Biar tidak reload 2x kalau tombol diklik lagi
-                iframe.src = `https://yt.masdpremium.biz.id`;
-            }
+            // 3. PAKSA LOAD IFRAME KE VPS MASD (Tanpa basa-basi)
+            document.getElementById('metubeFrame').src = "https://yt.masdpremium.biz.id";
 
             // 4. Scroll mulus ke bawah
             setTimeout(() => {
