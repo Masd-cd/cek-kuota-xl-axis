@@ -15,6 +15,10 @@
     {
       "source": "/api/proxy-ig",
       "destination": "https://endpoint-dinns.vercel.app/api/download/instagram"
+    },
+    {
+      "source": "/api/proxy-tt",
+      "destination": "https://endpoint-dinns.vercel.app/api/download/tiktok"
     }
   ]
 }
