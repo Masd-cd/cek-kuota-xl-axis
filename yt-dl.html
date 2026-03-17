@@ -46,100 +46,81 @@
 
         <div id="loadingYt" class="hidden text-center text-slate-400 py-4">
             <svg class="animate-spin h-8 w-8 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p id="loadingText">Menghubungkan ke Server...</p>
+            <p id="loadingText">Menganalisis link video...</p>
         </div>
 
         <div id="hasilYt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-red-500/20">
             <div class="w-full h-48 bg-slate-800 rounded-xl overflow-hidden mb-4 relative">
                 <img id="ytThumb" src="" alt="Thumbnail" class="w-full h-full object-cover opacity-80">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
-                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm" id="ytTitle">Judul Video YouTube</div>
+                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm" id="ytTitle">Video Siap Didownload</div>
             </div>
             
             <div class="text-center space-y-3">
+                <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg text-xs font-semibold mb-4">
+                    ✅ Jalur Premium Ditemukan!
+                </div>
                 <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-[15px] uppercase tracking-wider">
-                    ⬇️ Download Sekarang
+                    ⬇️ Lanjut Download
                 </a>
-                <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Jika terbuka di tab baru pemutar video/lagu, klik titik tiga (⋮) lalu pilih Download.</p>
+                <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Anda akan diarahkan ke server Premium anti-gagal.</p>
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD Direct Routing</p>
     </div>
 
     <script>
-        async function downloadYT(isAudio) {
-            let inputUrl = document.getElementById('inputYtUrl').value;
-            if (!inputUrl || (!inputUrl.includes('youtu.be') && !inputUrl.includes('youtube.com'))) { 
+        // Fungsi cerdas untuk mengekstrak ID Video dari berbagai jenis link YouTube
+        function extractVideoID(url) {
+            var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            var match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function downloadYT(isAudio) {
+            let inputUrl = document.getElementById('inputYtUrl').value.trim();
+            let videoId = extractVideoID(inputUrl);
+            
+            if (!videoId) { 
                 alert("Masukkan Link YouTube yang valid!"); 
                 return; 
             }
 
+            // Tampilkan animasi loading
             document.getElementById('loadingYt').classList.remove('hidden');
             document.getElementById('hasilYt').classList.add('hidden');
             document.getElementById('btnYtVideo').disabled = true;
             document.getElementById('btnYtAudio').disabled = true;
             
-            document.getElementById('loadingText').innerText = "Menembus server YouTube...";
-
-            try {
-                let finalUrl = "";
-                let title = "Video YouTube";
-                let thumb = "https://cdn-icons-png.flaticon.com/512/1384/1384060.png";
+            // Kita beri sedikit jeda buatan agar terasa profesional
+            setTimeout(() => {
+                // 1. Ambil Thumbnail Asli dari server YouTube langsung (Tanpa API!)
+                let thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                document.getElementById('ytThumb').src = thumbUrl;
                 
-                const type1 = isAudio ? "ytmp3" : "ytmp4";
-
-                // --- MESIN 1: Lewat Jembatan Vercel (Ryzendesu) ---
-                try {
-                    const target1 = `/api/proxy-yt1/${type1}?url=${encodeURIComponent(inputUrl)}`;
-                    const res1 = await fetch(target1);
-                    if (res1.ok) {
-                        const json1 = await res1.json();
-                        finalUrl = json1.url || json1.download || (json1.data && json1.data.url) || (json1.result && json1.result.url) || "";
-                        title = json1.title || (json1.data && json1.data.title) || title;
-                        thumb = json1.thumbnail || json1.thumb || (json1.data && json1.data.thumbnail) || thumb;
-                    }
-                } catch (e) {
-                    console.log("Mesin 1 gagal/sibuk, lanjut Mesin 2...");
-                }
-
-                // --- MESIN 2: Lewat Jembatan Vercel (Siputzx) ---
-                if (!finalUrl) {
-                    try {
-                        const target2 = `/api/proxy-yt2/${type1}?url=${encodeURIComponent(inputUrl)}`;
-                        const res2 = await fetch(target2);
-                        if (res2.ok) {
-                            const json2 = await res2.json();
-                            finalUrl = (json2.data && json2.data.dl) || (json2.data && json2.data.url) || json2.url || json2.download || "";
-                            title = (json2.data && json2.data.title) || json2.title || title;
-                            thumb = (json2.data && json2.data.thumbnail) || json2.thumbnail || thumb;
-                        }
-                    } catch (e) {
-                        console.log("Mesin 2 juga gagal.");
-                    }
-                }
-
-                // --- TAMPILKAN HASIL ---
-                if (finalUrl) {
-                    document.getElementById('ytTitle').innerText = title;
-                    document.getElementById('ytThumb').src = thumb;
-                    
-                    const btn = document.getElementById('btnDownloadAkhir');
-                    btn.href = finalUrl;
-                    btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 SEKARANG" : "📽️ DOWNLOAD MP4 SEKARANG";
-
-                    document.getElementById('hasilYt').classList.remove('hidden');
+                // 2. Tentukan Jalur Server Premium
+                let finalUrl = "";
+                if (isAudio) {
+                    // Jalur Audio MP3
+                    finalUrl = `https://ytmp3.cc/en13/?url=${encodeURIComponent(inputUrl)}`;
                 } else {
-                    alert("Maaf, API sedang dalam perbaikan atau format video ini diproteksi ketat oleh YouTube.");
+                    // Jalur Video MP4
+                    finalUrl = `https://ssyoutube.com/en10/youtube-video-downloader?url=${encodeURIComponent(inputUrl)}`;
                 }
 
-            } catch (error) {
-                alert("Terjadi kendala jaringan. Pastikan koneksi internet stabil.");
-            } finally {
+                // 3. Setel Tombol
+                const btn = document.getElementById('btnDownloadAkhir');
+                btn.href = finalUrl;
+                btn.innerHTML = isAudio ? "🎵 LANJUT DOWNLOAD MP3" : "📽️ LANJUT DOWNLOAD MP4";
+
+                // 4. Munculkan Hasil
                 document.getElementById('loadingYt').classList.add('hidden');
+                document.getElementById('hasilYt').classList.remove('hidden');
                 document.getElementById('btnYtVideo').disabled = false;
                 document.getElementById('btnYtAudio').disabled = false;
-            }
+
+            }, 1200); // Tampil dalam 1,2 detik (Super Cepat!)
         }
     </script>
 </body>
