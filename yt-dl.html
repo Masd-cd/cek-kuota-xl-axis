@@ -53,10 +53,14 @@
         </div>
 
         <div id="metubeContainer" class="hidden w-full">
-            <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-3 rounded-xl text-xs font-semibold mb-3 text-center flex items-center justify-center space-x-2">
-                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
-                <span>Server Terhubung! Link otomatis terisi.</span>
-            </div>
+            <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-3 rounded-xl text-xs font-semibold mb-3 text-center flex flex-col items-center justify-center">
+    <div class="flex items-center space-x-2 mb-1">
+        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+        <span id="notifText" class="text-sm">Server Terhubung!</span>
+    </div>
+    <span class="text-slate-300 text-[11px]">✅ Link otomatis disalin. Silakan <b>Paste/Tempel</b> di kotak bawah!</span>
+</div>
+
             
             <div class="card rounded-2xl shadow-xl shadow-black/40 border-slate-700 overflow-hidden relative">
                 <div class="w-full h-full bg-[#1a1a1a]">
@@ -68,7 +72,7 @@
         <p class="text-center text-slate-600 text-xs mt-4 pb-4">Secured by MasD Enterprise Infrastructure</p>
     </div>
 
-    <script>
+        <script>
         function bukaMesinBawah() {
             let inputUrl = document.getElementById('inputYtUrl').value.trim();
             
@@ -77,17 +81,23 @@
                 return; 
             }
 
-            // Memunculkan kontainer MeTube dengan animasi slide down
+            // 1. Trik Auto-Copy ke Clipboard HP
+            navigator.clipboard.writeText(inputUrl).catch(err => {
+                console.log("Clipboard otomatis ditolak browser, pengguna harus copy manual");
+            });
+
+            // 2. Memunculkan kontainer MeTube
             let container = document.getElementById('metubeContainer');
             container.classList.remove('hidden');
             container.classList.add('slide-down');
 
-            // Menyuntikkan URL langsung ke dalam Iframe MeTube (Auto-fill)
+            // 3. Load iframe (Tanpa ?url= karena MeTube tidak support)
             let iframe = document.getElementById('metubeFrame');
-            // Menambahkan parameter ?url= untuk pre-fill di MeTube
-            iframe.src = `https://yt.masdpremium.biz.id/?url=${encodeURIComponent(inputUrl)}`;
+            if (!iframe.src) { // Biar tidak reload 2x kalau tombol diklik lagi
+                iframe.src = `https://yt.masdpremium.biz.id`;
+            }
 
-            // Scroll perlahan ke bawah agar pengguna melihat ruang mesin
+            // 4. Scroll mulus ke bawah
             setTimeout(() => {
                 container.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }, 300);
