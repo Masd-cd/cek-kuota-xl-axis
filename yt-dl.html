@@ -83,29 +83,31 @@
             document.getElementById('loadingText').innerText = "Menembus server YouTube...";
 
             try {
+                        try {
                 let finalUrl = "";
                 let title = "Video YouTube";
-                let thumb = "https://cdn-icons-png.flaticon.com/512/1384/1384060.png"; // Gambar default
+                let thumb = "https://cdn-icons-png.flaticon.com/512/1384/1384060.png";
                 
                 const type1 = isAudio ? "ytmp3" : "ytmp4";
 
-                // --- MESIN 1: API RYZENDESU ---
+                // --- MESIN 1: Lewat Jembatan Vercel (Ryzendesu) ---
                 try {
-                    const res1 = await fetch(`https://api.ryzendesu.vip/api/downloader/${type1}?url=${encodeURIComponent(inputUrl)}`);
+                    const target1 = `/api/proxy-yt1/${type1}?url=${encodeURIComponent(inputUrl)}`;
+                    const res1 = await fetch(target1);
                     if (res1.ok) {
                         const json1 = await res1.json();
-                        // Cari link dengan mode detektif
                         finalUrl = json1.url || json1.download || (json1.data && json1.data.url) || (json1.result && json1.result.url);
                         title = json1.title || (json1.data && json1.data.title) || title;
                         thumb = json1.thumbnail || json1.thumb || (json1.data && json1.data.thumbnail) || thumb;
                     }
                 } catch (e) {
-                    console.log("Mesin 1 Sibuk, beralih ke Mesin 2...");
+                    console.log("Mesin 1 gagal/sibuk, lanjut Mesin 2...");
                 }
 
-                // --- MESIN 2: API SIPUTZX (Aktif jika Mesin 1 gagal) ---
+                // --- MESIN 2: Lewat Jembatan Vercel (Siputzx) ---
                 if (!finalUrl) {
-                    const res2 = await fetch(`https://api.siputzx.my.id/api/d/${type1}?url=${encodeURIComponent(inputUrl)}`);
+                    const target2 = `/api/proxy-yt2/${type1}?url=${encodeURIComponent(inputUrl)}`;
+                    const res2 = await fetch(target2);
                     if (res2.ok) {
                         const json2 = await res2.json();
                         finalUrl = (json2.data && json2.data.dl) || (json2.data && json2.data.url) || json2.url || json2.download || "";
