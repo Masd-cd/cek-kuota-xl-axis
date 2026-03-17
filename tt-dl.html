@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Downloader - MasD VPNStore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f8fafc; }
+        .card { background-color: #1e293b; border: 1px solid #334155; }
+        .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex justify-center p-4">
+
+    <div class="w-full max-w-md space-y-4 mt-4 fade-in-up">
+        
+        <a href="downloader.html" class="inline-flex items-center space-x-2 text-slate-400 hover:text-white transition-colors mb-4 bg-slate-800 px-4 py-2 rounded-lg border border-slate-700 active:scale-95">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span>Kembali ke Pilihan</span>
+        </a>
+
+        <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20 border-slate-600/50 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl -ml-10 -mb-10"></div>
+            
+            <div class="flex items-center space-x-3 mb-2 relative z-10">
+                <div class="bg-black p-2 rounded-lg border border-slate-700">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.589 6.686a4.793 4.793 0 01-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 01-5.201 1.743l-.002-.001.002.001a2.895 2.895 0 013.183-4.51v-3.5a6.329 6.329 0 00-5.394 10.692 6.33 6.33 0 0010.857-4.424V8.687a8.182 8.182 0 004.77 1.526V6.79a4.831 4.831 0 01-1.003-.104z"/></svg>
+                </div>
+                <h2 class="font-bold text-xl text-white">TikTok DL</h2>
+            </div>
+            <p class="text-sm text-slate-400 relative z-10">Tempelkan link video TikTok untuk mendownload tanpa watermark.</p>
+            <div class="flex flex-col space-y-3 mt-2 relative z-10">
+                <input type="url" id="inputTtUrl" placeholder="Contoh: https://vt.tiktok.com/..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all">
+                <button id="btnTtCek" onclick="downloadTT()" class="bg-slate-200 text-slate-900 font-bold py-3 px-6 rounded-lg hover:bg-white active:scale-95 transition-all text-center w-full shadow-[2px_2px_0px_rgba(6,182,212,0.8),-2px_-2px_0px_rgba(236,72,153,0.8)]">Cari Video</button>
+            </div>
+        </div>
+
+        <div id="loadingTt" class="hidden text-center text-slate-400 py-4">
+            <svg class="animate-spin h-8 w-8 mx-auto text-cyan-400 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p>Memproses link TikTok...</p>
+        </div>
+
+        <div id="hasilTt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-slate-600/30">
+            <div class="flex items-center space-x-4 mb-4 bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                <img id="ttThumb" src="" alt="Profile" class="w-12 h-12 rounded-full object-cover border-2 border-slate-600">
+                <div class="overflow-hidden">
+                    <h3 class="font-bold text-white text-sm truncate" id="ttUser">@username</h3>
+                    <p class="text-xs text-slate-400 truncate mt-0.5" id="ttDesc">Deskripsi video...</p>
+                </div>
+            </div>
+            
+            <div class="space-y-3" id="ttLinks">
+                <a id="btnNoWm" href="#" target="_blank" class="block w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-md">🎬 Download (No Watermark)</a>
+                <a id="btnAudio" href="#" target="_blank" class="block w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold py-3 px-4 rounded-lg text-center transition-colors border border-slate-600">🎵 Download Audio MP3</a>
+            </div>
+            <p class="text-[11px] text-slate-500 text-center mt-3">💡 Jika terbuka di tab baru, klik titik tiga (⋮) lalu Download.</p>
+        </div>
+        
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools</p>
+    </div>
+
+    <script>
+        const API_KEY = "MasDSukaCoL1";
+
+        async function downloadTT() {
+            let inputUrl = document.getElementById('inputTtUrl').value;
+            if (!inputUrl) { alert("Masukkan Link TikTok terlebih dahulu!"); return; }
+
+            document.getElementById('loadingTt').classList.remove('hidden');
+            document.getElementById('hasilTt').classList.add('hidden');
+            document.getElementById('btnTtCek').disabled = true;
+
+            try {
+                // Jembatan Vercel untuk TikTok
+                const targetUrl = `/api/proxy-tt?apikey=${API_KEY}&url=${encodeURIComponent(inputUrl)}`;
+                const response = await fetch(targetUrl);
+                
+                if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+
+                const json = await response.json();
+
+                if (json.success && json.data && json.data.nowatermark) {
+                    
+                    // Mengisi Data Info
+                    document.getElementById('ttThumb').src = json.data.thumbnail || "";
+                    document.getElementById('ttUser').innerText = json.data.username || "TikTok User";
+                    document.getElementById('ttDesc').innerText = json.data.description || "-";
+                    
+                    // Mengisi Link Download
+                    document.getElementById('btnNoWm').href = json.data.nowatermark;
+                    
+                    const btnAudio = document.getElementById('btnAudio');
+                    if(json.data.audio) {
+                        btnAudio.href = json.data.audio;
+                        btnAudio.classList.remove('hidden');
+                    } else {
+                        btnAudio.classList.add('hidden');
+                    }
+
+                    document.getElementById('hasilTt').classList.remove('hidden');
+                } else {
+                    alert("Gagal memproses! Pastikan link video TikTok valid/publik.");
+                }
+            } catch (error) {
+                alert("Detail Error:\n" + error.message);
+            } finally {
+                document.getElementById('loadingTt').classList.add('hidden');
+                document.getElementById('btnTtCek').disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
