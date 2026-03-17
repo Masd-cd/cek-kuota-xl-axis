@@ -46,28 +46,29 @@
 
         <div id="loadingYt" class="hidden text-center text-slate-400 py-4">
             <svg class="animate-spin h-8 w-8 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p id="loadingText">Menganalisis link video...</p>
+            <p id="loadingText">Mengekstrak File Asli...</p>
         </div>
 
         <div id="hasilYt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-red-500/20">
             <div class="w-full h-48 bg-slate-800 rounded-xl overflow-hidden mb-4 relative">
                 <img id="ytThumb" src="" alt="Thumbnail" class="w-full h-full object-cover opacity-80">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
-                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm" id="ytTitle">Video Siap Didownload</div>
+                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm" id="ytTitle">Video Ditemukan</div>
             </div>
             
             <div class="text-center space-y-3">
-                <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg text-xs font-semibold mb-4">
-                    ✅ Server Vevioz Online!
+                <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg text-xs font-semibold mb-2">
+                    ✅ File Berhasil Diekstrak!
                 </div>
+                
                 <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-[15px] uppercase tracking-wider">
-                    ⬇️ Lanjut ke Vevioz
+                    ⬇️ Download File
                 </a>
-                <p class="text-[11px] text-slate-400 mt-2">💡 Info: Pilih resolusi video atau audio di halaman selanjutnya, lalu tunggu proses <i>Generating</i> selesai.</p>
+                <p class="text-[11px] text-slate-400 mt-2">💡 Info: Jika video terputar di tab baru, klik titik tiga (⋮) di pojok bawah video lalu pilih <b>Download</b>.</p>
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & Vevioz Engine</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD Native API</p>
     </div>
 
     <script>
@@ -77,7 +78,7 @@
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        function downloadYT(isAudio) {
+        async function downloadYT(isAudio) {
             let inputUrl = document.getElementById('inputYtUrl').value.trim();
             let videoId = extractVideoID(inputUrl);
             
@@ -90,28 +91,56 @@
             document.getElementById('hasilYt').classList.add('hidden');
             document.getElementById('btnYtVideo').disabled = true;
             document.getElementById('btnYtAudio').disabled = true;
-            
-            setTimeout(() => {
-                // 1. Ambil Thumbnail
+
+            try {
+                let finalUrl = "";
+                let title = "Video Siap Didownload";
                 let thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                document.getElementById('ytThumb').src = thumbUrl;
-                
-                // 2. Kunci Target ke Vevioz Utama (Sesuai temuan Komandan!)
-                // URL format: https://vevioz.com/youtube/[ID]
-                let finalUrl = `https://vevioz.com/youtube/${videoId}`;
+                let type = isAudio ? "ytmp3" : "ytmp4";
 
-                // 3. Setel Tombol
-                const btn = document.getElementById('btnDownloadAkhir');
-                btn.href = finalUrl;
-                btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 DI VEVIOZ" : "📽️ DOWNLOAD MP4 DI VEVIOZ";
+                // --- MESIN 1: Coba Rahasia Dinns API ---
+                try {
+                    const targetDinns = `/api/proxy-dinns-yt?apikey=MasDSukaCoL1&url=${encodeURIComponent(inputUrl)}`;
+                    const resDinns = await fetch(targetDinns);
+                    if (resDinns.ok) {
+                        const jsonDinns = await resDinns.json();
+                        finalUrl = jsonDinns.data?.url || jsonDinns.data?.download || jsonDinns.url || "";
+                        title = jsonDinns.data?.title || title;
+                    }
+                } catch (e) { console.log("Dinns gagal, lanjut Agatz..."); }
 
-                // 4. Munculkan Hasil
+                // --- MESIN 2: Agatz API (Raja Downloader Lokal) ---
+                if (!finalUrl) {
+                    const targetAgatz = `/api/proxy-agatz/${type}?url=${encodeURIComponent(inputUrl)}`;
+                    const resAgatz = await fetch(targetAgatz);
+                    if (resAgatz.ok) {
+                        const jsonAgatz = await resAgatz.json();
+                        finalUrl = jsonAgatz.data?.download || jsonAgatz.data?.url || jsonAgatz.url || "";
+                        title = jsonAgatz.data?.title || title;
+                    }
+                }
+
+                // --- TAMPILKAN HASIL ---
+                if (finalUrl) {
+                    document.getElementById('ytThumb').src = thumbUrl;
+                    document.getElementById('ytTitle').innerText = title;
+                    
+                    const btn = document.getElementById('btnDownloadAkhir');
+                    btn.href = finalUrl;
+                    btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 SEKARANG" : "📽️ DOWNLOAD MP4 SEKARANG";
+
+                    document.getElementById('hasilYt').classList.remove('hidden');
+                } else {
+                    alert("Gagal mengekstrak. File diproteksi oleh YouTube atau API sedang offline.");
+                }
+
+            } catch (error) {
+                alert("Terjadi kendala jaringan saat mengambil file.");
+            } finally {
                 document.getElementById('loadingYt').classList.add('hidden');
-                document.getElementById('hasilYt').classList.remove('hidden');
                 document.getElementById('btnYtVideo').disabled = false;
                 document.getElementById('btnYtAudio').disabled = false;
-
-            }, 800); 
+            }
         }
     </script>
 </body>
