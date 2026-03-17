@@ -19,14 +19,14 @@
     {
       "source": "/api/proxy-tt",
       "destination": "https://endpoint-dinns.vercel.app/api/download/tiktok"
+    }},
+    {
+      "source": "/api/proxy-dinns-yt",
+      "destination": "https://endpoint-dinns.vercel.app/api/download/youtube"
     },
     {
-      "source": "/api/proxy-yt1/:path*",
-      "destination": "https://api.ryzendesu.vip/api/downloader/:path*"
-    },
-    {
-      "source": "/api/proxy-yt2/:path*",
-      "destination": "https://api.siputzx.my.id/api/d/:path*"
+      "source": "/api/proxy-agatz/:path*",
+      "destination": "https://api.agatz.xyz/api/:path*"
     }
   ]
 }
