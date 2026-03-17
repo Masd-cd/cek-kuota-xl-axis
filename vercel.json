@@ -21,8 +21,12 @@
       "destination": "https://endpoint-dinns.vercel.app/api/download/tiktok"
     },
     {
-      "source": "/api/proxy-yt",
-      "destination": "https://api.cobalt.tools/api/json"
+      "source": "/api/proxy-yt1/:path*",
+      "destination": "https://api.ryzendesu.vip/api/downloader/:path*"
+    },
+    {
+      "source": "/api/proxy-yt2/:path*",
+      "destination": "https://api.siputzx.my.id/api/d/:path*"
     }
   ]
 }
