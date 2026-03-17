@@ -58,12 +58,12 @@
             
             <div class="text-center space-y-3">
                 <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg text-xs font-semibold mb-4">
-                    ✅ Jalur Aman Ditemukan!
+                    ✅ Jalur Premium Dirpy Ditemukan!
                 </div>
                 <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-[15px] uppercase tracking-wider">
-                    ⬇️ Lanjut ke Y2Mate
+                    ⬇️ Lanjut ke Dirpy Studio
                 </a>
-                <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Y2Mate adalah server paling stabil. Anda bisa memilih ukuran MB dan resolusi di halaman berikutnya.</p>
+                <p class="text-[11px] text-slate-400 mt-2">💡 Info: Dirpy adalah server premium bebas iklan. Cukup klik tombol <b>Record Audio</b> (untuk MP3) atau <b>Record Video</b> (untuk MP4) di halaman selanjutnya.</p>
             </div>
         </div>
         
@@ -96,13 +96,13 @@
                 let thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                 document.getElementById('ytThumb').src = thumbUrl;
                 
-                // 2. Kunci Target ke Y2Mate (Jauh lebih bagus dari SaveFrom)
-                let finalUrl = `https://www.y2mate.com/youtube/${videoId}`;
+                // 2. Kunci Target ke Dirpy (Situs DVR super bersih, jarang diblokir)
+                let finalUrl = `https://dirpy.com/studio?url=${encodeURIComponent(inputUrl)}`;
 
                 // 3. Setel Tombol
                 const btn = document.getElementById('btnDownloadAkhir');
                 btn.href = finalUrl;
-                btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 DI Y2MATE" : "📽️ DOWNLOAD MP4 DI Y2MATE";
+                btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 DI DIRPY" : "📽️ DOWNLOAD MP4 DI DIRPY";
 
                 // 4. Munculkan Hasil
                 document.getElementById('loadingYt').classList.add('hidden');
