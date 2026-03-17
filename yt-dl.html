@@ -10,7 +10,6 @@
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        iframe { border: none; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body class="font-sans antialiased min-h-screen flex justify-center p-4">
@@ -23,22 +22,18 @@
         </a>
 
         <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20 border-red-500/30 relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-red-600/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-            
-            <div class="flex items-center space-x-3 mb-2 relative z-10">
-                <div class="bg-red-600 p-2 rounded-lg shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+            <div class="flex items-center space-x-3 mb-2">
+                <div class="bg-red-600 p-2 rounded-lg">
                     <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </div>
                 <h2 class="font-bold text-xl text-white">YouTube DL</h2>
             </div>
-            <p class="text-sm text-slate-400 relative z-10">Tempelkan link video atau Shorts YouTube di bawah ini.</p>
+            <p class="text-sm text-slate-400">Tempelkan link video atau Shorts YouTube di bawah ini.</p>
             
-            <div class="flex flex-col space-y-3 mt-2 relative z-10">
-                <input type="url" id="inputYtUrl" placeholder="Contoh: https://youtu.be/..." 
-                       class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all">
+            <div class="flex flex-col space-y-3">
+                <input type="url" id="inputYtUrl" placeholder="Contoh: https://youtu.be/..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500">
                 
-                <button id="btnYtVideo" onclick="downloadYT()" 
-                        class="bg-gradient-to-r from-red-600 to-red-500 text-white font-bold py-3 px-4 rounded-lg hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] active:scale-95 transition-all text-center w-full">
+                <button id="btnYtVideo" onclick="downloadYT()" class="bg-gradient-to-r from-red-600 to-red-500 text-white font-bold py-3 px-4 rounded-lg hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] active:scale-95 w-full">
                     Mulai Ekstrak File
                 </button>
             </div>
@@ -46,22 +41,27 @@
 
         <div id="loadingYt" class="hidden text-center text-slate-400 py-4">
             <svg class="animate-spin h-8 w-8 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p class="mt-2 text-sm">Memuat Downloader Self-Hosted...</p>
+            <p class="mt-2 text-sm">Menyiapkan Downloader...</p>
         </div>
 
-        <!-- === DOWNLOADER LANGSUNG DI DALAM HALAMAN === -->
         <div id="hasilYt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-emerald-500/20">
             <div class="text-center space-y-4">
                 <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-3 rounded-lg text-sm font-semibold">
-                    ✅ Downloader Siap di Dalam Halaman Ini!
+                    ✅ Link sudah dicopy otomatis!
                 </div>
                 
-                <div class="bg-[#111] rounded-xl overflow-hidden border border-slate-700" style="height: 620px;">
-                    <iframe id="metubeFrame" src="http://152.42.217.17:8081" 
-                            class="w-full h-full" allowfullscreen></iframe>
+                <!-- IFRAME (masih dicoba) -->
+                <div id="iframeContainer" class="bg-[#111] rounded-xl overflow-hidden border border-slate-700 hidden" style="height: 620px;">
+                    <iframe id="metubeFrame" src="http://152.42.217.17:8081" class="w-full h-full" allowfullscreen></iframe>
                 </div>
                 
-                <p class="text-[11px] text-slate-400">💡 Link sudah otomatis dicopy. Paste di kolom atas MeTube & pilih MP3/MP4. File tersimpan di VPS kamu.</p>
+                <!-- FALLBACK BUTTON -->
+                <button onclick="fallbackOpenMeTube()" 
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white py-3 px-8 rounded-xl font-bold transition-all w-full">
+                    Buka MeTube di Tab Baru (Paling Aman)
+                </button>
+                
+                <p class="text-[11px] text-slate-400">💡 Paste link di kolom atas MeTube & pilih MP3/MP4. File tersimpan di VPS kamu.</p>
                 
                 <button onclick="document.getElementById('inputYtUrl').focus()" 
                         class="bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-xl font-medium transition-all w-full">
@@ -70,31 +70,32 @@
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & MeTube Self-Hosted (Embedded)</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & MeTube Self-Hosted</p>
     </div>
 
     <script>
         function downloadYT() {
             let inputUrl = document.getElementById('inputYtUrl').value.trim();
-            
-            if (!inputUrl) { 
-                alert("Masukkan Link YouTube yang valid!"); 
-                return; 
-            }
+            if (!inputUrl) { alert("Masukkan Link YouTube yang valid!"); return; }
 
             document.getElementById('loadingYt').classList.remove('hidden');
             document.getElementById('hasilYt').classList.add('hidden');
             document.getElementById('btnYtVideo').disabled = true;
 
             setTimeout(() => {
-                // Copy link ke clipboard
                 navigator.clipboard.writeText(inputUrl);
                 
-                // Tampilkan iframe MeTube langsung di halaman
                 document.getElementById('loadingYt').classList.add('hidden');
                 document.getElementById('hasilYt').classList.remove('hidden');
                 document.getElementById('btnYtVideo').disabled = false;
+                
+                // Coba tampilkan iframe (kalau gagal tetap hitam, user pakai button fallback)
+                document.getElementById('iframeContainer').classList.remove('hidden');
             }, 800);
+        }
+
+        function fallbackOpenMeTube() {
+            window.open('http://152.42.217.17:8081', '_blank');
         }
     </script>
 </body>
