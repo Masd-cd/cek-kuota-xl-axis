@@ -46,22 +46,25 @@
 
         <div id="loadingYt" class="hidden text-center text-slate-400 py-4">
             <svg class="animate-spin h-8 w-8 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p id="loadingText">Mengekstrak dari YouTube...</p>
+            <p id="loadingText">Menghubungkan ke Server...</p>
         </div>
 
         <div id="hasilYt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-red-500/20">
+            <div class="w-full h-48 bg-slate-800 rounded-xl overflow-hidden mb-4 relative">
+                <img id="ytThumb" src="" alt="Thumbnail" class="w-full h-full object-cover opacity-80">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
+                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm" id="ytTitle">Judul Video YouTube</div>
+            </div>
+            
             <div class="text-center space-y-3">
-                <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-3 rounded-lg text-sm font-semibold mb-4">
-                    ✅ File berhasil diekstrak!
-                </div>
-                <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-lg uppercase tracking-wider">
+                <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-[15px] uppercase tracking-wider">
                     ⬇️ Download Sekarang
                 </a>
                 <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Jika terbuka di tab baru pemutar video/lagu, klik titik tiga (⋮) lalu pilih Download.</p>
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & Cobalt API</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & Local APIs</p>
     </div>
 
     <script>
@@ -77,45 +80,56 @@
             document.getElementById('btnYtVideo').disabled = true;
             document.getElementById('btnYtAudio').disabled = true;
             
-            document.getElementById('loadingText').innerText = isAudio ? "Mengekstrak Audio MP3..." : "Menyiapkan Video MP4...";
+            document.getElementById('loadingText').innerText = "Menembus server YouTube...";
 
             try {
-                // Menembak langsung ke API Cobalt (Tanpa Proxy Vercel)
-                const response = await fetch('/api/proxy-yt', {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        url: inputUrl,
-                        isAudioOnly: isAudio,
-                        aFormat: isAudio ? "mp3" : "best",
-                        vQuality: "720"
-                    })
-                });
+                let finalUrl = "";
+                let title = "Video YouTube";
+                let thumb = "https://cdn-icons-png.flaticon.com/512/1384/1384060.png"; // Gambar default
                 
-                if (!response.ok) throw new Error(`Gagal terhubung ke server Cobalt.`);
+                const type1 = isAudio ? "ytmp3" : "ytmp4";
 
-                const json = await response.json();
+                // --- MESIN 1: API RYZENDESU ---
+                try {
+                    const res1 = await fetch(`https://api.ryzendesu.vip/api/downloader/${type1}?url=${encodeURIComponent(inputUrl)}`);
+                    if (res1.ok) {
+                        const json1 = await res1.json();
+                        // Cari link dengan mode detektif
+                        finalUrl = json1.url || json1.download || (json1.data && json1.data.url) || (json1.result && json1.result.url);
+                        title = json1.title || (json1.data && json1.data.title) || title;
+                        thumb = json1.thumbnail || json1.thumb || (json1.data && json1.data.thumbnail) || thumb;
+                    }
+                } catch (e) {
+                    console.log("Mesin 1 Sibuk, beralih ke Mesin 2...");
+                }
 
-                if (json.status === "stream" || json.status === "redirect" || json.url) {
+                // --- MESIN 2: API SIPUTZX (Aktif jika Mesin 1 gagal) ---
+                if (!finalUrl) {
+                    const res2 = await fetch(`https://api.siputzx.my.id/api/d/${type1}?url=${encodeURIComponent(inputUrl)}`);
+                    if (res2.ok) {
+                        const json2 = await res2.json();
+                        finalUrl = (json2.data && json2.data.dl) || (json2.data && json2.data.url) || json2.url || json2.download || "";
+                        title = (json2.data && json2.data.title) || json2.title || title;
+                        thumb = (json2.data && json2.data.thumbnail) || json2.thumbnail || thumb;
+                    }
+                }
+
+                // --- TAMPILKAN HASIL ---
+                if (finalUrl) {
+                    document.getElementById('ytTitle').innerText = title;
+                    document.getElementById('ytThumb').src = thumb;
                     
-                    const finalUrl = json.url;
-                    
-                    // Set link ke tombol raksasa
                     const btn = document.getElementById('btnDownloadAkhir');
                     btn.href = finalUrl;
                     btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 SEKARANG" : "📽️ DOWNLOAD MP4 SEKARANG";
 
                     document.getElementById('hasilYt').classList.remove('hidden');
-                } else if (json.status === "error") {
-                    alert("Error dari Server: " + (json.text || "Tidak dapat memproses video ini."));
                 } else {
-                    alert("Gagal mengekstrak link download.");
+                    alert("Maaf, API sedang dalam perbaikan atau format video ini diproteksi ketat oleh YouTube.");
                 }
+
             } catch (error) {
-                alert("Terjadi kendala jaringan:\n" + error.message);
+                alert("Terjadi kendala jaringan. Pastikan koneksi internet stabil.");
             } finally {
                 document.getElementById('loadingYt').classList.add('hidden');
                 document.getElementById('btnYtVideo').disabled = false;
