@@ -63,7 +63,7 @@
                 <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-[15px] uppercase tracking-wider">
                     ⬇️ Lanjut Download
                 </a>
-                <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Anda akan diarahkan ke server Premium anti-gagal.</p>
+                <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Anda akan diarahkan ke halaman yang sudah otomatis siap download.</p>
             </div>
         </div>
         
@@ -71,7 +71,7 @@
     </div>
 
     <script>
-        // Fungsi cerdas untuk mengekstrak ID Video dari berbagai jenis link YouTube
+        // Fungsi cerdas untuk mengekstrak ID Video
         function extractVideoID(url) {
             var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             var match = url.match(regExp);
@@ -93,20 +93,19 @@
             document.getElementById('btnYtVideo').disabled = true;
             document.getElementById('btnYtAudio').disabled = true;
             
-            // Kita beri sedikit jeda buatan agar terasa profesional
             setTimeout(() => {
-                // 1. Ambil Thumbnail Asli dari server YouTube langsung (Tanpa API!)
+                // 1. Ambil Thumbnail
                 let thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
                 document.getElementById('ytThumb').src = thumbUrl;
                 
-                // 2. Tentukan Jalur Server Premium
+                // 2. JALUR BARU YANG DIJAMIN LANGSUNG KEISI!
                 let finalUrl = "";
                 if (isAudio) {
-                    // Jalur Audio MP3
-                    finalUrl = `https://ytmp3.cc/en13/?url=${encodeURIComponent(inputUrl)}`;
+                    // Y2Mate sangat ahli auto-fill untuk MP3
+                    finalUrl = `https://www.y2mate.com/youtube/${videoId}`;
                 } else {
-                    // Jalur Video MP4
-                    finalUrl = `https://ssyoutube.com/en10/youtube-video-downloader?url=${encodeURIComponent(inputUrl)}`;
+                    // SaveFrom trik klasik (otomatis baca ID)
+                    finalUrl = `https://www.ssyoutube.com/watch?v=${videoId}`;
                 }
 
                 // 3. Setel Tombol
@@ -120,7 +119,7 @@
                 document.getElementById('btnYtVideo').disabled = false;
                 document.getElementById('btnYtAudio').disabled = false;
 
-            }, 1200); // Tampil dalam 1,2 detik (Super Cepat!)
+            }, 800); 
         }
     </script>
 </body>
