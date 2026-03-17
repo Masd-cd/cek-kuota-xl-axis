@@ -46,59 +46,71 @@
 
         <div id="loadingYt" class="hidden text-center text-slate-400 py-4">
             <svg class="animate-spin h-8 w-8 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p id="loadingText">Menyiapkan Mesin Downloader...</p>
+            <p id="loadingText">Menganalisis link video...</p>
         </div>
 
         <div id="hasilYt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-red-500/20">
-            <div class="text-center space-y-2">
-                <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg text-xs font-semibold mb-2">
-                    ✅ Mesin Siap! Silakan klik tombol di bawah.
+            <div class="w-full h-48 bg-slate-800 rounded-xl overflow-hidden mb-4 relative">
+                <img id="ytThumb" src="" alt="Thumbnail" class="w-full h-full object-cover opacity-80">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
+                <div class="absolute bottom-3 left-3 right-3 text-white font-bold text-sm" id="ytTitle">Video Siap Didownload</div>
+            </div>
+            
+            <div class="text-center space-y-3">
+                <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-2 rounded-lg text-xs font-semibold mb-4">
+                    ✅ Jalur Aman Ditemukan!
                 </div>
-                
-                <div class="w-full bg-slate-800 rounded-xl overflow-hidden border border-slate-700 flex justify-center items-center" style="height: 80px;">
-                    <iframe id="widgetFrame" src="" class="w-full h-full border-0" scrolling="no" allowtransparency="true"></iframe>
-                </div>
-                
-                <p class="text-[11px] text-slate-400 mt-3">💡 Jika muncul iklan *pop-up* saat tombol ditekan, segera tekan tombol **Kembali (Back)** di HP Anda, lalu tekan tombol Download lagi.</p>
+                <a id="btnDownloadAkhir" href="#" target="_blank" class="block w-full bg-red-600 hover:bg-red-500 text-white font-bold py-4 px-4 rounded-xl text-center transition-colors shadow-lg shadow-red-500/30 text-[15px] uppercase tracking-wider">
+                    ⬇️ Lanjut ke Y2Mate
+                </a>
+                <p class="text-[11px] text-slate-400 mt-2">💡 Tips: Y2Mate adalah server paling stabil. Anda bisa memilih ukuran MB dan resolusi di halaman berikutnya.</p>
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD Widget Engine</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD Direct Routing</p>
     </div>
 
     <script>
+        function extractVideoID(url) {
+            var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            var match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
         function downloadYT(isAudio) {
             let inputUrl = document.getElementById('inputYtUrl').value.trim();
+            let videoId = extractVideoID(inputUrl);
             
-            if (!inputUrl || (!inputUrl.includes('youtu.be') && !inputUrl.includes('youtube.com'))) { 
+            if (!videoId) { 
                 alert("Masukkan Link YouTube yang valid!"); 
                 return; 
             }
 
-            // Tampilkan animasi loading
             document.getElementById('loadingYt').classList.remove('hidden');
             document.getElementById('hasilYt').classList.add('hidden');
             document.getElementById('btnYtVideo').disabled = true;
             document.getElementById('btnYtAudio').disabled = true;
             
-            // Beri jeda 1 detik agar animasi loading terasa natural
             setTimeout(() => {
-                // Tentukan format (mp3 atau mp4)
-                let format = isAudio ? "mp3" : "mp4";
+                // 1. Ambil Thumbnail
+                let thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                document.getElementById('ytThumb').src = thumbUrl;
                 
-                // Gunakan warna merah khas MasD Tools (Kode warna hex: dc2626)
-                let widgetUrl = `https://loader.to/api/button/?url=${encodeURIComponent(inputUrl)}&f=${format}&color=dc2626`;
+                // 2. Kunci Target ke Y2Mate (Jauh lebih bagus dari SaveFrom)
+                let finalUrl = `https://www.y2mate.com/youtube/${videoId}`;
 
-                // Tembakkan URL ke dalam bingkai Iframe
-                document.getElementById('widgetFrame').src = widgetUrl;
+                // 3. Setel Tombol
+                const btn = document.getElementById('btnDownloadAkhir');
+                btn.href = finalUrl;
+                btn.innerHTML = isAudio ? "🎵 DOWNLOAD MP3 DI Y2MATE" : "📽️ DOWNLOAD MP4 DI Y2MATE";
 
-                // Munculkan kotaknya
+                // 4. Munculkan Hasil
                 document.getElementById('loadingYt').classList.add('hidden');
                 document.getElementById('hasilYt').classList.remove('hidden');
                 document.getElementById('btnYtVideo').disabled = false;
                 document.getElementById('btnYtAudio').disabled = false;
 
-            }, 1000); 
+            }, 800); 
         }
     </script>
 </body>
