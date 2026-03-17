@@ -64,13 +64,13 @@
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & Local APIs</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD & API Tools</p>
     </div>
 
     <script>
         async function downloadYT(isAudio) {
             let inputUrl = document.getElementById('inputYtUrl').value;
-            if (!inputUrl || !inputUrl.includes('youtu')) { 
+            if (!inputUrl || (!inputUrl.includes('youtu.be') && !inputUrl.includes('youtube.com'))) { 
                 alert("Masukkan Link YouTube yang valid!"); 
                 return; 
             }
@@ -83,7 +83,6 @@
             document.getElementById('loadingText').innerText = "Menembus server YouTube...";
 
             try {
-                        try {
                 let finalUrl = "";
                 let title = "Video YouTube";
                 let thumb = "https://cdn-icons-png.flaticon.com/512/1384/1384060.png";
@@ -96,7 +95,7 @@
                     const res1 = await fetch(target1);
                     if (res1.ok) {
                         const json1 = await res1.json();
-                        finalUrl = json1.url || json1.download || (json1.data && json1.data.url) || (json1.result && json1.result.url);
+                        finalUrl = json1.url || json1.download || (json1.data && json1.data.url) || (json1.result && json1.result.url) || "";
                         title = json1.title || (json1.data && json1.data.title) || title;
                         thumb = json1.thumbnail || json1.thumb || (json1.data && json1.data.thumbnail) || thumb;
                     }
@@ -106,13 +105,17 @@
 
                 // --- MESIN 2: Lewat Jembatan Vercel (Siputzx) ---
                 if (!finalUrl) {
-                    const target2 = `/api/proxy-yt2/${type1}?url=${encodeURIComponent(inputUrl)}`;
-                    const res2 = await fetch(target2);
-                    if (res2.ok) {
-                        const json2 = await res2.json();
-                        finalUrl = (json2.data && json2.data.dl) || (json2.data && json2.data.url) || json2.url || json2.download || "";
-                        title = (json2.data && json2.data.title) || json2.title || title;
-                        thumb = (json2.data && json2.data.thumbnail) || json2.thumbnail || thumb;
+                    try {
+                        const target2 = `/api/proxy-yt2/${type1}?url=${encodeURIComponent(inputUrl)}`;
+                        const res2 = await fetch(target2);
+                        if (res2.ok) {
+                            const json2 = await res2.json();
+                            finalUrl = (json2.data && json2.data.dl) || (json2.data && json2.data.url) || json2.url || json2.download || "";
+                            title = (json2.data && json2.data.title) || json2.title || title;
+                            thumb = (json2.data && json2.data.thumbnail) || json2.thumbnail || thumb;
+                        }
+                    } catch (e) {
+                        console.log("Mesin 2 juga gagal.");
                     }
                 }
 
