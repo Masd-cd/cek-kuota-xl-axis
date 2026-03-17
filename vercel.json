@@ -19,7 +19,7 @@
     {
       "source": "/api/proxy-tt",
       "destination": "https://endpoint-dinns.vercel.app/api/download/tiktok"
-    }},
+    },
     {
       "source": "/api/proxy-dinns-yt",
       "destination": "https://endpoint-dinns.vercel.app/api/download/youtube"
