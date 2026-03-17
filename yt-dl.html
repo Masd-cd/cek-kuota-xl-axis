@@ -46,7 +46,7 @@
 
         <div id="loadingYt" class="hidden text-center text-slate-400 py-4">
             <svg class="animate-spin h-8 w-8 mx-auto text-red-500 mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p id="loadingText">Mengekstrak File Asli...</p>
+            <p id="loadingText" class="mt-2 text-sm">Mengekstrak file (Harap sabar, bisa memakan waktu hingga 30 detik)...</p>
         </div>
 
         <div id="hasilYt" class="card p-4 rounded-2xl hidden shadow-lg shadow-black/20 border-red-500/20">
@@ -68,7 +68,7 @@
             </div>
         </div>
         
-        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD Native API</p>
+        <p class="text-center text-slate-600 text-xs mt-8 pb-4">Built with MasD Native No-Timeout API</p>
     </div>
 
     <script>
@@ -96,27 +96,44 @@
                 let finalUrl = "";
                 let title = "Video Siap Didownload";
                 let thumbUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-                let type = isAudio ? "ytmp3" : "ytmp4";
+                
+                // Kumpulan Mesin API Anti-CORS yang Tembus Batas
+                let daftarAPI = [];
+                if (isAudio) {
+                    daftarAPI = [
+                        `https://widipe.com/download/ytdl?url=${encodeURIComponent(inputUrl)}`,
+                        `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(inputUrl)}`,
+                        `https://api.vreden.web.id/api/ytmp3?url=${encodeURIComponent(inputUrl)}`
+                    ];
+                } else {
+                    daftarAPI = [
+                        `https://widipe.com/download/ytdl?url=${encodeURIComponent(inputUrl)}`,
+                        `https://api.ryzendesu.vip/api/downloader/ytmp4?url=${encodeURIComponent(inputUrl)}`,
+                        `https://api.vreden.web.id/api/ytmp4?url=${encodeURIComponent(inputUrl)}`
+                    ];
+                }
 
-                // --- MESIN 1: Coba Rahasia Dinns API ---
-                try {
-                    const targetDinns = `/api/proxy-dinns-yt?apikey=MasDSukaCoL1&url=${encodeURIComponent(inputUrl)}`;
-                    const resDinns = await fetch(targetDinns);
-                    if (resDinns.ok) {
-                        const jsonDinns = await resDinns.json();
-                        finalUrl = jsonDinns.data?.url || jsonDinns.data?.download || jsonDinns.url || "";
-                        title = jsonDinns.data?.title || title;
-                    }
-                } catch (e) { console.log("Dinns gagal, lanjut Agatz..."); }
-
-                // --- MESIN 2: Agatz API (Raja Downloader Lokal) ---
-                if (!finalUrl) {
-                    const targetAgatz = `/api/proxy-agatz/${type}?url=${encodeURIComponent(inputUrl)}`;
-                    const resAgatz = await fetch(targetAgatz);
-                    if (resAgatz.ok) {
-                        const jsonAgatz = await resAgatz.json();
-                        finalUrl = jsonAgatz.data?.download || jsonAgatz.data?.url || jsonAgatz.url || "";
-                        title = jsonAgatz.data?.title || title;
+                // Sistem Loop Cerdas: Coba API 1, kalau gagal lanjut ke 2, dst.
+                for (let i = 0; i < daftarAPI.length; i++) {
+                    if (finalUrl) break; // Kalau sudah ketemu, berhenti mencari
+                    
+                    try {
+                        let targetUrl = daftarAPI[i];
+                        let res = await fetch(targetUrl);
+                        
+                        if (res.ok) {
+                            let json = await res.json();
+                            
+                            // Detektif Mode: Nyari link download di dalam JSON yang berbeda-beda strukturnya
+                            if (isAudio) {
+                                finalUrl = json.result?.mp3 || json.result?.audio || json.data?.url || json.url || json.download || "";
+                            } else {
+                                finalUrl = json.result?.mp4 || json.result?.video || json.data?.url || json.url || json.download || "";
+                            }
+                            title = json.result?.title || json.data?.title || json.title || title;
+                        }
+                    } catch (e) {
+                        console.log("Mesin ke-" + (i+1) + " sibuk, pindah ke mesin selanjutnya...");
                     }
                 }
 
@@ -131,11 +148,11 @@
 
                     document.getElementById('hasilYt').classList.remove('hidden');
                 } else {
-                    alert("Gagal mengekstrak. File diproteksi oleh YouTube atau API sedang offline.");
+                    alert("Seluruh 3 Mesin API sedang sibuk atau video ini diproteksi ketat oleh YouTube.");
                 }
 
             } catch (error) {
-                alert("Terjadi kendala jaringan saat mengambil file.");
+                alert("Terjadi masalah jaringan lokal di HP kamu.");
             } finally {
                 document.getElementById('loadingYt').classList.add('hidden');
                 document.getElementById('btnYtVideo').disabled = false;
