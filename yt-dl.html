@@ -9,9 +9,14 @@
         body { background-color: #0f172a; color: #f8fafc; }
         .card { background-color: #1e293b; border: 1px solid #334155; }
         .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        .slide-down { animation: slideDown 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); height: 0; overflow: hidden; }
+            to { opacity: 1; transform: translateY(0); height: 600px; }
         }
     </style>
 </head>
@@ -24,28 +29,69 @@
             <span>Kembali ke Pilihan</span>
         </a>
 
-        <div class="card rounded-2xl shadow-xl shadow-black/40 border-emerald-500/30 overflow-hidden relative">
+        <div class="card p-5 rounded-2xl space-y-4 shadow-lg shadow-black/20 border-red-500/30 relative overflow-hidden z-20">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-red-600/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
             
-            <div class="bg-slate-900 px-4 py-3 border-b border-slate-700 flex justify-between items-center relative z-10 shadow-md">
-                <div class="flex items-center space-x-2">
-                    <div class="w-3 h-3 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-                    <span class="text-xs font-bold text-emerald-400 tracking-wider">MASD PRIVATE SERVER</span>
+            <div class="flex items-center space-x-3 mb-2 relative z-10">
+                <div class="bg-red-600 p-2 rounded-lg shadow-[0_0_10px_rgba(239,68,68,0.4)]">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                 </div>
-                <div class="flex space-x-1">
-                    <div class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
+                <div>
+                    <h2 class="font-bold text-xl text-white">YouTube Downloader</h2>
+                    <p class="text-[10px] text-red-400 font-bold tracking-wider">MASD PRIVATE SERVER</p>
                 </div>
             </div>
             
-            <div class="w-full h-[650px] bg-[#1a1a1a]">
-                <iframe src="https://yt.masdpremium.biz.id" class="w-full h-full border-0" allowtransparency="true"></iframe>
+            <div class="flex flex-col space-y-3 relative z-10 mt-4">
+                <input type="url" id="inputYtUrl" placeholder="Tempel link video/shorts di sini..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all">
+                
+                <button onclick="bukaMesinBawah()" class="bg-gradient-to-r from-red-600 to-red-500 text-white font-bold py-3 px-4 rounded-lg hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] active:scale-95 transition-all text-center flex justify-center items-center space-x-2">
+                    <span>Akses Mesin Ekstraktor</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="metubeContainer" class="hidden w-full">
+            <div class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 p-3 rounded-xl text-xs font-semibold mb-3 text-center flex items-center justify-center space-x-2">
+                <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                <span>Server Terhubung! Link otomatis terisi.</span>
             </div>
             
+            <div class="card rounded-2xl shadow-xl shadow-black/40 border-slate-700 overflow-hidden relative">
+                <div class="w-full h-full bg-[#1a1a1a]">
+                    <iframe id="metubeFrame" src="" class="w-full h-[600px] border-0" allowtransparency="true"></iframe>
+                </div>
+            </div>
         </div>
         
         <p class="text-center text-slate-600 text-xs mt-4 pb-4">Secured by MasD Enterprise Infrastructure</p>
     </div>
 
+    <script>
+        function bukaMesinBawah() {
+            let inputUrl = document.getElementById('inputYtUrl').value.trim();
+            
+            if (!inputUrl) { 
+                alert("Masukkan Link YouTube terlebih dahulu!"); 
+                return; 
+            }
+
+            // Memunculkan kontainer MeTube dengan animasi slide down
+            let container = document.getElementById('metubeContainer');
+            container.classList.remove('hidden');
+            container.classList.add('slide-down');
+
+            // Menyuntikkan URL langsung ke dalam Iframe MeTube (Auto-fill)
+            let iframe = document.getElementById('metubeFrame');
+            // Menambahkan parameter ?url= untuk pre-fill di MeTube
+            iframe.src = `https://yt.masdpremium.biz.id/?url=${encodeURIComponent(inputUrl)}`;
+
+            // Scroll perlahan ke bawah agar pengguna melihat ruang mesin
+            setTimeout(() => {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 300);
+        }
+    </script>
 </body>
 </html>
